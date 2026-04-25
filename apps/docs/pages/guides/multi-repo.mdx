@@ -1,0 +1,219 @@
+---
+title: 서버·앱 분리 저장소에서 Lore AI 운영
+description: 백엔드와 프론트엔드가 별도 저장소로 분리된 경우의 lore.config 배치 · publish 충돌 회피.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# 서버·앱 분리 저장소에서 Lore AI 운영
+
+> **TL;DR** — `lore init` 을 어디에 한 번 할지, 두 번 할지가 셋업의 핵심입니다. 정답은 저장소 구조에 따라 다릅니다.
+
+서버 (Django 등) 와 앱 (React Native / Web) 이 **각각 다른 git 저장소** 로 분리된 경우 세 가지 모델 중 하나를 선택해야 합니다.
+
+---
+
+## 옵션 A — 모노레포 (한 저장소)
+
+```text
+my-workspace/
+├── backend/             # Django
+├── app/                 # Expo
+├── lore.config.yaml     ← 한 곳
+└── .lore/flows/         ← 합쳐진 결과
+```
+
+**`lore init` 한 번**, `projects:` 에 두 프로젝트를 정의:
+
+```yaml
+projects:
+  server:
+    root: ./backend
+    language: python
+    include: ['**/views.py', '**/models.py', '**/services.py']
+  client:
+    root: ./app
+    language: typescript
+    include: ['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}']
+```
+
+`lore sync` 한 번이 두 언어의 어노테이션을 **카테고리별로 합쳐서** `.lore/flows/auth.md` 한 파일에 backend 심볼 + frontend 심볼을 함께 쓰입니다. 가장 단순하고 v0 의 권장 모델입니다.
+
+이 모델의 시드는 [`templates/django-expo`](https://github.com/terracelab/lore-ai/tree/main/templates/django-expo) 에 있습니다:
+
+```bash
+lore init --template django-expo
+```
+
+---
+
+## 옵션 B — 분리된 두 저장소 (`*-back`, `*-app`)
+
+각 저장소에서 **`lore init` 따로**. 각자 자기 `lore.config.yaml`, 자기 `.lore/flows/`.
+
+```text
+airpoint-back/                     airpoint-app/
+├── lore.config.yaml               ├── lore.config.yaml
+├── .lore/flows/                   ├── .lore/flows/
+│   ├── auth.md          ⚠ 같은   │   ├── auth.md          ⚠ 같은
+│   └── subscription.md   파일명   │   └── subscription.md   파일명
+└── ...                            └── ...
+```
+
+<Callout type="warning">
+  두 저장소가 **같은 Lore Board 프로젝트 slug** 로 publish 하면 같은 카테고리 파일이 서로 덮어쓰기 됩니다.
+
+  ```text
+  airpoint-back  .lore/flows/auth.md ──┐
+                                       ├──▶ content/projects/airpoint/flows/auth.md
+  airpoint-app   .lore/flows/auth.md ──┘   마지막에 publish 한 쪽만 남음
+  ```
+</Callout>
+
+이 충돌을 피하는 두 가지 방법이 있습니다.
+
+### B-1. 도메인 토큰을 분리 (권장)
+
+backend 와 frontend 가 **서로 다른 카테고리 토큰** 을 쓰도록 합니다. 같은 도메인이라도 관점이 다르므로 자연스러운 분리가 가능합니다.
+
+<Tabs items={['Backend (airpoint-back)', 'Frontend (airpoint-app)']}>
+<Tabs.Tab>
+```yaml
+domains:
+  subscription:
+    label: 구독 데이터
+    subdomains: [master, renewal, trial]
+  payment:
+    label: 결제
+    subdomains: [order, refund]
+  auth:
+    label: 인증/세션
+    subdomains: [oauth, session]
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```yaml
+domains:
+  ui:
+    label: 화면/컴포넌트
+    subdomains: [subscription-card, checkout-screen, profile]
+  navigation:
+    label: 네비게이션
+    subdomains: [stack, tab, deep-link]
+  state:
+    label: 클라이언트 상태
+    subdomains: [zustand, react-query]
+```
+</Tabs.Tab>
+</Tabs>
+
+→ 두 저장소가 같은 `publish.project: airpoint` 로 publish 해도 결과 파일들이 **서로 다른 슬러그** 라 충돌 없음. 사용자는 Lore Board 의 단일 "에어포인트" 카드 안에서 backend/frontend 카테고리를 함께 봅니다.
+
+**원칙**: backend 는 *데이터·정책* 도메인, frontend 는 *화면·상호작용* 도메인. 같은 비즈니스 개념이라도 층이 다릅니다.
+
+### B-2. publish.project slug 분리
+
+도메인이 자연스럽게 안 갈라지면 (예: 두 저장소가 같은 도메인의 거의 동일한 부분을 표현) 아예 Lore Board 카드를 둘로 나눕니다.
+
+```yaml
+# airpoint-back/lore.config.yaml
+publish:
+  project: airpoint-server
+
+# airpoint-app/lore.config.yaml
+publish:
+  project: airpoint-app
+```
+
+Lore Board 의 `content/projects.json` 에도 두 항목을 추가:
+
+```json
+{ "slug": "airpoint-server", "name": "에어포인트 서버", "icon": "🔵", "order": 1 },
+{ "slug": "airpoint-app",    "name": "에어포인트 앱",   "icon": "📱", "order": 2 }
+```
+
+**단점**: 사용자가 "어느 카드를 봐야 하지?" 고민. **장점**: 충돌 0, CI 도 단순.
+
+---
+
+## 옵션 C — 워크스페이스 가짜 저장소
+
+분리된 두 저장소를 그대로 두면서 통합 sync 결과를 얻고 싶을 때.
+
+```text
+~/dev/projects/
+├── airpoint-back/        # 그대로 (수정 없음)
+├── airpoint-app/         # 그대로 (수정 없음)
+└── airpoint-lore/        # ← 새로 만든 워크스페이스
+    ├── lore.config.yaml
+    └── .lore/flows/
+```
+
+워크스페이스 `lore.config.yaml`:
+
+```yaml
+projects:
+  server:
+    root: ../airpoint-back
+    language: python
+    include: ['apps/**/views.py', 'apps/**/models.py']
+  client:
+    root: ../airpoint-app
+    language: typescript
+    include: ['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}']
+
+domains:
+  subscription:
+    label: 구독
+    subdomains: [master, renewal, ui]   # 두 저장소 도메인이 합쳐짐
+  # ...
+
+publish:
+  target: ~/dev/projects/onboarding/lore-board
+  project: airpoint
+  mode: direct
+```
+
+**장점**: 옵션 A 의 통합 sync 효과 + 두 소스 저장소는 그대로 (코드 변경 없음).
+**단점**: 워크스페이스 저장소를 하나 더 관리해야 함. 어노테이션 달린 코드와 sync 결과가 물리적으로 떨어져 있어 약간의 인지 부담.
+
+소유자가 한 명이고 dogfooding 단계면 좋은 절충안입니다.
+
+---
+
+## 어떤 걸 고를까
+
+| 상황 | 권장 |
+|------|------|
+| 새 프로젝트 시작 · 모노레포 가능 | **A** |
+| 이미 back/app 분리 · 도메인이 자연스럽게 다른 층 (`auth/db` vs `ui/login`) | **B-1** |
+| 이미 back/app 분리 · 동일 도메인을 양쪽이 다 다룸 | **C** (워크스페이스) 또는 **B-2** (slug 분리) |
+| 회사 표준 · 새 프로젝트도 계속 추가 예정 | **B-1** + 도메인 네이밍 컨벤션 미리 확정 |
+
+---
+
+## 자주 묻는 것
+
+### Q. 옵션 B 에서 두 저장소의 `.lore/flows/` 가 충돌하면?
+
+**publish 시점**에만 충돌합니다. 로컬 `.lore/flows/` 는 각 저장소 안에서만 살기 때문에 git 충돌은 없습니다. publish 가 같은 destination 의 같은 파일을 덮어쓰는 게 문제이므로, B-1 (도메인 분리) 또는 B-2 (slug 분리) 중 하나만 적용하면 끝입니다.
+
+### Q. 옵션 C 의 워크스페이스 저장소도 git 으로 관리하나요?
+
+권장합니다. `lore.config.yaml` · `.lore/flows/` · 도메인 네이밍 결정 메모를 한 곳에 둘 수 있습니다. private 으로 두고 팀 안에서만 공유.
+
+### Q. 도중에 모델을 바꿀 수 있나요?
+
+네. 옵션 B → C 는 새 워크스페이스 저장소를 만들고 `lore.config.yaml` 의 `root` 만 상대 경로로 바꾸면 됩니다. 옵션 A → B 는 `lore.config.yaml` 을 두 저장소로 split 한 뒤 도메인 토큰을 [재구성](#b-1-도메인-토큰을-분리-권장) 하면 됩니다. 코드의 어노테이션은 그대로 유지됩니다.
+
+### Q. 셋 다 `lore publish` 명령은 같나요?
+
+같습니다. `publish.target` 과 `publish.project` 만 정확히 맞춰주면 동일한 명령으로 동작합니다. [CLI: lore publish](/cli/publish) 참고.
+
+---
+
+## 다음
+
+- [Django 가이드](/guides/django-project) · [React Native 가이드](/guides/react-native) — 단일 저장소 셋업
+- [Lore Board 파이프라인](/concepts/lore-board) — publish 결과가 회사 위키에 어떻게 도달하는지
+- [어노테이션 스펙](/concepts/annotations) — 도메인 토큰 명명 규칙
