@@ -23,7 +23,7 @@ interface RawBlock {
  * Extract annotation blocks from source text.
  *
  * The block detector is intentionally simple: it picks up
- * Python `"""..."""` docstrings and TS `/** ... */` JSDoc blocks
+ * Python triple-quoted docstrings and TS JSDoc blocks
  * and returns the trimmed line array.
  */
 export function findAnnotationBlocks(source: string, language: Language): RawBlock[] {
