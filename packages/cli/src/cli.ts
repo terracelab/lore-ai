@@ -1,3 +1,5 @@
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
 import { checkCommand } from './commands/check.js';
@@ -65,4 +67,15 @@ export function buildProgram(): Command {
 export async function run(argv: string[] = process.argv): Promise<void> {
   const program = buildProgram();
   await program.parseAsync(argv);
+}
+
+const invokedDirectly =
+  !!process.argv[1] &&
+  realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+
+if (invokedDirectly) {
+  run().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }
