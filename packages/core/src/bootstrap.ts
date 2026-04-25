@@ -46,13 +46,7 @@ export interface ProjectEvidence {
   groups: FrontendGroup[];
 }
 
-export type SiblingKind =
-  | 'expo'
-  | 'react-native'
-  | 'next'
-  | 'react'
-  | 'django'
-  | 'unknown';
+export type SiblingKind = 'expo' | 'react-native' | 'next' | 'react' | 'django' | 'unknown';
 
 export interface MonorepoSibling {
   /** path relative to the bootstrap cwd, e.g. "../nuri-app" */
@@ -426,10 +420,7 @@ export function renderSiblings(siblings: MonorepoSibling[]): string {
     '',
   ];
   for (const s of siblings) {
-    const dirsStr =
-      s.topDirs.length > 0
-        ? ` · 발견된 디렉토리: ${s.topDirs.join(', ')}`
-        : '';
+    const dirsStr = s.topDirs.length > 0 ? ` · 발견된 디렉토리: ${s.topDirs.join(', ')}` : '';
     lines.push(`- **${s.path}/** — ${s.kind} (${s.signal})${dirsStr}`);
   }
   return lines.join('\n');
@@ -611,12 +602,7 @@ export function buildHeuristicDraft(workspace: WorkspaceEvidence | ProjectEviden
     yamlLines.push(`    subdomains: [${val.subdomains.join(', ')}]    # TODO: 정제`);
   }
 
-  const mapLines = [
-    '# 도메인 맵 (L1)',
-    '',
-    '> `lore.config.yaml` 의 `domains:` 와 일치 유지.',
-    '',
-  ];
+  const mapLines = ['# 도메인 맵 (L1)', '', '> `lore.config.yaml` 의 `domains:` 와 일치 유지.', ''];
   for (const [key, val] of sorted) {
     mapLines.push(`## ${val.label} (${key})`);
     mapLines.push('TODO: 한 줄 역할/책임 설명');
@@ -627,10 +613,7 @@ export function buildHeuristicDraft(workspace: WorkspaceEvidence | ProjectEviden
   // Optional projects: addition draft for untracked siblings
   let projectsAddition: string | undefined;
   if (siblings.length > 0) {
-    const addLines: string[] = [
-      '# 추가 후보 — `projects:` 블록에 다음 항목 추가 검토:',
-      '',
-    ];
+    const addLines: string[] = ['# 추가 후보 — `projects:` 블록에 다음 항목 추가 검토:', ''];
     for (const s of siblings) {
       const language: 'python' | 'typescript' = s.kind === 'django' ? 'python' : 'typescript';
       const includeGuess: string[] =
@@ -647,7 +630,11 @@ export function buildHeuristicDraft(workspace: WorkspaceEvidence | ProjectEviden
               '      - "**/services/**/*.py"',
             ];
 
-      const slug = basename(s.path).replace(/^\.+/, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'sibling';
+      const slug =
+        basename(s.path)
+          .replace(/^\.+/, '')
+          .replace(/[^a-z0-9]+/gi, '-')
+          .toLowerCase() || 'sibling';
       addLines.push(`  ${slug}:`);
       addLines.push(`    root: ${s.path}`);
       addLines.push(`    language: ${language}`);

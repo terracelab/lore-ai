@@ -93,6 +93,7 @@ pnpm changeset
 ```
 
 프롬프트:
+
 1. 영향받는 패키지 선택 (스페이스바)
 2. 변경 유형 선택: `major` / `minor` / `patch`
 3. 한 줄 요약 (유저가 읽음 → changelog 에 그대로 들어감)
@@ -100,6 +101,7 @@ pnpm changeset
 `.changeset/<name>.md` 파일이 생기면 커밋에 포함시키세요.
 
 **patch 예시**:
+
 ```
 ---
 '@lore-ai-automation/core': patch
@@ -156,6 +158,7 @@ Fix @History block parsing when date contains hyphens.
 릴리즈는 메인테이너만 수행합니다. 자세한 절차는 [RELEASING.md](./RELEASING.md).
 
 요약:
+
 1. main 에 머지된 changeset 이 쌓임
 2. `changesets/action` 봇이 "Version Packages" PR 자동 생성
 3. 메인테이너가 PR 리뷰 후 머지

@@ -30,10 +30,7 @@ export function HowItWorks() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {layers.map((l) => (
-            <div
-              key={l.tag}
-              className="rounded-lg border border-border bg-bg p-6 shadow-sm"
-            >
+            <div key={l.tag} className="rounded-lg border border-border bg-bg p-6 shadow-sm">
               <div className="font-mono text-xs text-primary">{l.tag}</div>
               <div className="mt-1 text-xl font-semibold">{l.title}</div>
               <p className="mt-2 text-sm text-muted">{l.desc}</p>

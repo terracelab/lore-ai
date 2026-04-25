@@ -43,9 +43,7 @@ const publishSchema = z
     authorName: z.string().default('Lore Bot'),
     authorEmail: z.string().email().default('lore@terracelab.co.kr'),
     prefix: z.string().default('chore(docs): sync'),
-    skipPaths: z
-      .array(z.string())
-      .default(['content/handbook/**', 'content/projects.json']),
+    skipPaths: z.array(z.string()).default(['content/handbook/**', 'content/projects.json']),
   })
   .optional();
 

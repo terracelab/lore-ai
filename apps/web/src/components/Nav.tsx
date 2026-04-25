@@ -20,16 +20,10 @@ export function Nav() {
           <a href="https://docs.lore-ai.vercel.app" className="text-muted hover:text-fg">
             Docs
           </a>
-          <a
-            href="https://github.com/terracelab/lore-ai"
-            className="text-muted hover:text-fg"
-          >
+          <a href="https://github.com/terracelab/lore-ai" className="text-muted hover:text-fg">
             GitHub
           </a>
-          <a
-            href="https://www.npmjs.com/package/lore-ai"
-            className="text-muted hover:text-fg"
-          >
+          <a href="https://www.npmjs.com/package/lore-ai" className="text-muted hover:text-fg">
             npm
           </a>
           {mounted && (

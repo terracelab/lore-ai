@@ -233,5 +233,7 @@ export async function initCommand(options: InitOptions): Promise<void> {
   log.hint('  템플릿: https://github.com/terracelab/lore-ai/tree/main/templates/ai');
   log.hint('');
   log.hint('Lore Board 등록은 별도 — content/projects.json 에 한 항목 추가:');
-  log.hint('   { "slug": "<your-slug>", "name": "...", "icon": "🔵", "order": 1, "status": "draft" }');
+  log.hint(
+    '   { "slug": "<your-slug>", "name": "...", "icon": "🔵", "order": 1, "status": "draft" }',
+  );
 }

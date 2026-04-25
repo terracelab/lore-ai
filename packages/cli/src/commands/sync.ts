@@ -48,9 +48,7 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
   const cwd = process.cwd();
   const { config } = await loadConfig(cwd);
 
-  const projectKeys = options.project
-    ? [options.project]
-    : Object.keys(config.projects);
+  const projectKeys = options.project ? [options.project] : Object.keys(config.projects);
   if (projectKeys.length === 0) {
     log.error('No projects defined in lore.config.yaml');
     process.exitCode = 1;

@@ -6,15 +6,15 @@
 
 ## 정식 태그 (이 7개만 허용)
 
-| 태그 | 등급 | 형식 | 예시 |
-|------|------|------|------|
-| `@Domain` | **필수** | `<token>` 또는 `<token>/<sub>` (`,` 다중) | `@Domain: subscription/master` |
-| `@BusinessLogic` | **필수** | 한 줄 (60자 권장) | `@BusinessLogic: valid_until 지나면 is_active=False` |
-| `@History` | **조건부 필수** | `- YYYY-MM-DD: <변경> (백필 여부)` 다중 | `@History:`<br/>`  - 2024-03-15: trial 7일 → 14일` |
-| `@Context` | 선택 | 의사결정 배경 한 줄 | `@Context: trial 후 자동 결제 실패 시 3일 grace` |
-| `@Flow` | 선택 | flow id (`,` 다중) | `@Flow: auto-renewal, grace-period` |
-| `@MigratedFrom` | 선택 | 이전 위치/이름 | `@MigratedFrom: legacy.PaymentService` |
-| `@SeeAlso` | 선택 | 관련 심볼 (`,` 다중) | `@SeeAlso: SubscriptionRenewer, NotifyService` |
+| 태그             | 등급            | 형식                                      | 예시                                                 |
+| ---------------- | --------------- | ----------------------------------------- | ---------------------------------------------------- |
+| `@Domain`        | **필수**        | `<token>` 또는 `<token>/<sub>` (`,` 다중) | `@Domain: subscription/master`                       |
+| `@BusinessLogic` | **필수**        | 한 줄 (60자 권장)                         | `@BusinessLogic: valid_until 지나면 is_active=False` |
+| `@History`       | **조건부 필수** | `- YYYY-MM-DD: <변경> (백필 여부)` 다중   | `@History:`<br/>`  - 2024-03-15: trial 7일 → 14일`   |
+| `@Context`       | 선택            | 의사결정 배경 한 줄                       | `@Context: trial 후 자동 결제 실패 시 3일 grace`     |
+| `@Flow`          | 선택            | flow id (`,` 다중)                        | `@Flow: auto-renewal, grace-period`                  |
+| `@MigratedFrom`  | 선택            | 이전 위치/이름                            | `@MigratedFrom: legacy.PaymentService`               |
+| `@SeeAlso`       | 선택            | 관련 심볼 (`,` 다중)                      | `@SeeAlso: SubscriptionRenewer, NotifyService`       |
 
 **위 7개 외의 태그 (`@lore-*`, `@logic`, `@no-side-effects`, `@since`, `@deprecated`,
 `@author` 등) 를 직접 만들거나 다른 시스템의 관습을 가져오지 마세요.**
@@ -30,6 +30,7 @@
 ## `@History` 가 필요한 경우 (조건부 필수)
 
 추가하세요:
+
 - 컬럼의 NULL 정책 변경
 - ENUM/Choice 값 추가/제거/리네임
 - 기본값 변경 (신규/구 row 의미가 달라짐)
@@ -37,10 +38,12 @@
 - **백필 없는** 마이그레이션
 
 스킵 가능:
+
 - 순수 리팩토링·이름 변경·성능 개선
 - 의미 변화 없는 인덱스 추가
 
 형식:
+
 ```python
 @History:
   - 2024-03-15: trial 7일 → 14일 (이전 가입자는 7일 기준, 백필 없음)
@@ -112,7 +115,7 @@ export async function refreshPushToken() { ... }
 1. 비즈니스 로직 파일 수정 전, 관련 `.lore/flows/<카테고리>.md` 를 먼저 읽기
 2. 새 비즈니스 함수/모델/엔드포인트 추가 시 위 형식 그대로 주석 작성
 3. 데이터 의미 변경이면 `@History` 추가
-4. 편집 후 즉시 (사용자 응답 *전*) 검증:
+4. 편집 후 즉시 (사용자 응답 _전_) 검증:
    ```bash
    lore check <편집한 파일>
    ```

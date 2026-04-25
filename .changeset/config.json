@@ -1,9 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
-  "changelog": [
-    "@changesets/changelog-github",
-    { "repo": "terracelab/lore-ai" }
-  ],
+  "changelog": ["@changesets/changelog-github", { "repo": "terracelab/lore-ai" }],
   "commit": false,
   "fixed": [["@lore-ai-automation/core", "@lore-ai-automation/parser", "lore-ai"]],
   "linked": [],

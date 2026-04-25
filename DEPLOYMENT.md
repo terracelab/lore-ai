@@ -47,7 +47,7 @@ git push -u origin main
 ### 1.4 시크릿
 
 - `Settings → Secrets and variables → Actions → New secret`
-  - `NPM_TOKEN` — npmjs.com 의 *Automation* 타입 토큰
+  - `NPM_TOKEN` — npmjs.com 의 _Automation_ 타입 토큰
 
 GitHub Token 은 자동 (`secrets.GITHUB_TOKEN`).
 
@@ -79,6 +79,7 @@ GitHub Token 은 자동 (`secrets.GITHUB_TOKEN`).
 ### 2.3 (선택) 커스텀 도메인
 
 향후 `lore-ai.dev` 등 유료 도메인 구입 시:
+
 - Vercel 프로젝트 → Settings → Domains 에서 추가
 - DNS 는 Vercel 의 nameserver 사용 권장 (CNAME 보다 안정)
 
@@ -136,13 +137,13 @@ npm view @lore-ai-automation/parser
 
 ## 5. 모니터링 (무료)
 
-| 대상 | 도구 | URL |
-|------|------|-----|
-| GitHub | 자체 (Insights · Dependency graph) | repo |
-| npm 다운로드 | npm-stat | npm-stat.com/charts.html?package=lore-ai |
-| 사이트 트래픽 | Vercel Web Analytics (Hobby 무료) | Vercel dashboard |
-| 빌드 상태 | Vercel + GitHub Actions | repo Actions 탭 |
-| 보안 advisory | GitHub Security (자동) | repo Security 탭 |
+| 대상          | 도구                               | URL                                      |
+| ------------- | ---------------------------------- | ---------------------------------------- |
+| GitHub        | 자체 (Insights · Dependency graph) | repo                                     |
+| npm 다운로드  | npm-stat                           | npm-stat.com/charts.html?package=lore-ai |
+| 사이트 트래픽 | Vercel Web Analytics (Hobby 무료)  | Vercel dashboard                         |
+| 빌드 상태     | Vercel + GitHub Actions            | repo Actions 탭                          |
+| 보안 advisory | GitHub Security (자동)             | repo Security 탭                         |
 
 ---
 
@@ -164,7 +165,8 @@ npm view @lore-ai-automation/parser
 
 **증상**: `pnpm: command not found` 또는 `lockfile mismatch`
 
-**해결**: Vercel 의 *Install Command* 를:
+**해결**: Vercel 의 _Install Command_ 를:
+
 ```bash
 corepack enable && pnpm install --frozen-lockfile
 ```
@@ -176,7 +178,7 @@ corepack enable && pnpm install --frozen-lockfile
 
 ### 7.3 npm publish 가 401
 
-- `NPM_TOKEN` 이 *Automation* 타입인지 (Publish 타입은 OTP 요구)
+- `NPM_TOKEN` 이 _Automation_ 타입인지 (Publish 타입은 OTP 요구)
 - 토큰의 scope 가 `lore-ai`, `@lore-ai-automation/*` 를 포함하는지
 
 ### 7.4 Pagefind 검색 빈 결과

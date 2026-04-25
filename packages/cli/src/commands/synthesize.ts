@@ -23,7 +23,10 @@ async function gatherFilesFor(project: ProjectConfig, cwd: string): Promise<stri
   });
 }
 
-export async function synthesizeCommand(category: string, options: SynthesizeOptions): Promise<void> {
+export async function synthesizeCommand(
+  category: string,
+  options: SynthesizeOptions,
+): Promise<void> {
   const cwd = process.cwd();
   const { config } = await loadConfig(cwd);
 
@@ -66,6 +69,8 @@ export async function synthesizeCommand(category: string, options: SynthesizeOpt
     return;
   }
 
-  log.warn('--apply mode requires Anthropic SDK wiring (planned for v0.2). Showing prompt instead.');
+  log.warn(
+    '--apply mode requires Anthropic SDK wiring (planned for v0.2). Showing prompt instead.',
+  );
   process.stdout.write(prompt + '\n');
 }

@@ -86,10 +86,7 @@ export function findAnnotationBlocks(source: string, language: Language): RawBlo
  * Parse a single annotation block into an `Annotation`.
  * Returns `null` if neither `@Domain` nor `@BusinessLogic` is present.
  */
-export function parseBlock(
-  block: RawBlock,
-  file: string,
-): Annotation | null {
+export function parseBlock(block: RawBlock, file: string): Annotation | null {
   const tags: Partial<Record<AnnotationTag, string[]>> = {};
   const history: HistoryEntry[] = [];
   let currentTag: AnnotationTag | null = null;

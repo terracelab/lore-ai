@@ -30,16 +30,16 @@ source_files: 23
 ---
 ```
 
-| 필드 | 필수 | 의미 |
-|------|------|-----|
-| `slug` | ✅ | 파일명·라우트 키 |
-| `title` | ✅ | 사이드바 표시명 |
-| `icon` | ✅ | 이모지 1개 |
-| `order` | ✅ | 정렬 |
-| `summary` | — | 카드 서브타이틀 |
-| `tags` | — | 검색·필터 |
-| `last_reviewed` | — | sync 일자 |
-| `source_files` | — | 추출 소스 수 |
+| 필드            | 필수 | 의미             |
+| --------------- | ---- | ---------------- |
+| `slug`          | ✅   | 파일명·라우트 키 |
+| `title`         | ✅   | 사이드바 표시명  |
+| `icon`          | ✅   | 이모지 1개       |
+| `order`         | ✅   | 정렬             |
+| `summary`       | —    | 카드 서브타이틀  |
+| `tags`          | —    | 검색·필터        |
+| `last_reviewed` | —    | sync 일자        |
+| `source_files`  | —    | 추출 소스 수     |
 
 자세한 contract 는 [reference/frontmatter](/reference/frontmatter) 참고.
 
@@ -51,9 +51,11 @@ source_files: 23
 # 📘 시그널
 
 ## 1. 시그널의 종류
+
 구독자에게 노출되는 4가지 종류 …
 
 ## 2. 발행 파이프라인
+
 DetectionWorker → SignalEvent → …
 ```
 

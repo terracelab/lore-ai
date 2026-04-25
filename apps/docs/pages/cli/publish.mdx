@@ -15,12 +15,15 @@ lore publish [--target <path|git>] [--mode direct|pr] [--branch main] [--dry-run
 ### `direct` (기본 · 권장)
 
 **로컬 경로**
+
 ```bash
 lore publish --target ~/dev/projects/onboarding/lore-board
 ```
+
 파일을 복사하고 끝. 커밋·푸시는 사람이.
 
 **Git URL** (v0.2 — 현재는 로컬 경로 권장)
+
 ```bash
 lore publish --target git@github.com:terracelab/lore-board.git --branch main
 ```
@@ -30,11 +33,13 @@ lore publish --target git@github.com:terracelab/lore-board.git --branch main
 ```bash
 lore publish --mode pr --target git@github.com:terracelab/lore-board.git
 ```
+
 임시 브랜치 생성 → push → PR 자동 open.
 
 ## 보호 경로
 
 다음 경로는 **항상 스킵** (덮어쓰지 않음):
+
 - `content/handbook/**`
 - `content/projects.json`
 
@@ -48,9 +53,9 @@ publish:
   branch: main
   project: airpoint
   mode: direct
-  authorName: "Lore Bot"
-  authorEmail: "lore@terracelab.co.kr"
-  prefix: "chore(docs): sync"
+  authorName: 'Lore Bot'
+  authorEmail: 'lore@terracelab.co.kr'
+  prefix: 'chore(docs): sync'
   skipPaths:
     - content/handbook/**
     - content/projects.json

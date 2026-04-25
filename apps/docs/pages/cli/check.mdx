@@ -14,10 +14,10 @@ lore check $(git diff --cached --name-only)         # precommit
 
 ## 옵션
 
-| 플래그 | 설명 |
-|--------|------|
-| `--json` | 머신 가독 출력 |
-| `--no-color` | 색상 비활성화 |
+| 플래그       | 설명           |
+| ------------ | -------------- |
+| `--json`     | 머신 가독 출력 |
+| `--no-color` | 색상 비활성화  |
 
 ## 종료 코드
 
@@ -26,12 +26,12 @@ lore check $(git diff --cached --name-only)         # precommit
 
 ## 위반 규칙
 
-| 규칙 | 등급 | 의미 |
-|------|------|------|
-| `require-domain` | error | `@Domain` 누락 |
-| `require-business-logic` | error | `@BusinessLogic` 누락 |
-| `unknown-domain` | error | 등록되지 않은 토큰 사용 |
-| `history-on-data-change` | warn | 데이터 의미 변경 감지 시 |
+| 규칙                     | 등급  | 의미                     |
+| ------------------------ | ----- | ------------------------ |
+| `require-domain`         | error | `@Domain` 누락           |
+| `require-business-logic` | error | `@BusinessLogic` 누락    |
+| `unknown-domain`         | error | 등록되지 않은 토큰 사용  |
+| `history-on-data-change` | warn  | 데이터 의미 변경 감지 시 |
 
 ## precommit 통합
 

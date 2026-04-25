@@ -5,15 +5,15 @@ projects:
     root: ./
     language: typescript
     include:
-      - "app/**/*.{ts,tsx}"
-      - "src/**/*.{ts,tsx}"
-      - "lib/**/*.ts"
-      - "hooks/**/*.ts"
+      - 'app/**/*.{ts,tsx}'
+      - 'src/**/*.{ts,tsx}'
+      - 'lib/**/*.ts'
+      - 'hooks/**/*.ts'
     exclude:
-      - "**/*.test.*"
-      - "**/*.spec.*"
-      - "**/node_modules/**"
-      - ".next/**"
+      - '**/*.test.*'
+      - '**/*.spec.*'
+      - '**/node_modules/**'
+      - '.next/**'
 
 domains:
   auth:

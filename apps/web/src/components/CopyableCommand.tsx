@@ -31,9 +31,7 @@ export function CopyableCommand({ command, className }: Props) {
     >
       <span className="text-muted">$</span>
       <code className="text-fg">{command}</code>
-      <span className="text-xs text-muted group-hover:text-fg">
-        {copied ? '복사됨' : '복사'}
-      </span>
+      <span className="text-xs text-muted group-hover:text-fg">{copied ? '복사됨' : '복사'}</span>
     </button>
   );
 }

@@ -3,6 +3,7 @@
 > 코드가 `main` 에 머지된 시점부터 **첫 npm publish + 사이트 라이브** 까지를 시간 순서로 정리한 체크리스트.
 >
 > 참고 문서:
+>
 > - 전반 설계 → [OSS_RELEASE_PLAN.md](./OSS_RELEASE_PLAN.md)
 > - GitHub · Vercel · npm 셋업 디테일 → [DEPLOYMENT.md](./DEPLOYMENT.md)
 > - 릴리즈 자동화 흐름 → [RELEASING.md](./RELEASING.md)
@@ -133,6 +134,7 @@ pnpm --filter docs dev   # http://localhost:3001
 ```
 
 체크 항목:
+
 - 웹 — Hero/Features/Demo/CTA 모두 렌더, 다크 토글, "복사" 버튼, GitHub/npm/Docs 링크
 - 도큐 — 사이드바 (`Getting Started` → `Concepts` → `CLI Reference` …), 검색창, 다크모드, `/cli/sync`·`/concepts/annotations` 같은 라우트 200
 
@@ -141,7 +143,7 @@ pnpm --filter docs dev   # http://localhost:3001
 - [ ] CLI 가 실제 워크스페이스에서 일관된 결과를 냄
 - [ ] frontmatter 가 [reference/frontmatter](apps/docs/pages/reference/frontmatter.mdx) 와 1:1 일치
 - [ ] 사이트의 모든 외부 링크 클릭 가능 (`https://docs.lore-ai.vercel.app` 등)
-  → 아직 라이브 전이라 404 가 정상. publish 후 재확인 (Phase 5)
+      → 아직 라이브 전이라 404 가 정상. publish 후 재확인 (Phase 5)
 - [ ] `pnpm publish --dry-run` 출력에 의도하지 않은 파일이 없음
 
 ---
@@ -201,8 +203,8 @@ git push -u origin main
 
 리포지토리 **Settings → Secrets and variables → Actions → New repository secret**:
 
-| Name | Value |
-|------|-------|
+| Name        | Value                                 |
+| ----------- | ------------------------------------- |
 | `NPM_TOKEN` | Phase 1.3 에서 발급한 Automation 토큰 |
 
 `GITHUB_TOKEN` 은 자동 (별도 등록 불필요).
@@ -272,7 +274,7 @@ Discussions 탭 → ⚙ → 기본 카테고리에 추가:
 
 각 프로젝트 → Settings → Domains:
 
-- `lore-ai-web`  → `lore-ai.vercel.app` 추가 (기본 alias 면 자동)
+- `lore-ai-web` → `lore-ai.vercel.app` 추가 (기본 alias 면 자동)
 - `lore-ai-docs` → `docs.lore-ai.vercel.app` (또는 `lore-ai-docs.vercel.app`)
 
 ### 3.4 배포 검증
@@ -418,14 +420,14 @@ GitHub Discussions → **📣 Show and tell** → 새 토론:
 
 ## Phase 6 — 후속 (선택, v0 이후)
 
-| 항목 | 비용 | 시점 |
-|------|------|------|
-| 유료 도메인 (`lore-ai.dev` 등) | ~₩15,000/년 | Product Hunt 론칭 직전 |
-| Discord 커뮤니티 서버 | $0 | ⭐ 200+ 또는 외부 채택 3건 이상 |
-| Algolia DocSearch (Pagefind 대체) | $0 (OSS 무료 신청) | 도큐 페이지 50+ |
-| Open Collective | $0 | 후원 의사 표시 받았을 때 |
-| MCP 서버 (`packages/mcp`) 출시 | — | v1 (Phase F) |
-| 셀프호스트 dashboard (`packages/dashboard`) | — | v1 (Phase F) |
+| 항목                                        | 비용               | 시점                            |
+| ------------------------------------------- | ------------------ | ------------------------------- |
+| 유료 도메인 (`lore-ai.dev` 등)              | ~₩15,000/년        | Product Hunt 론칭 직전          |
+| Discord 커뮤니티 서버                       | $0                 | ⭐ 200+ 또는 외부 채택 3건 이상 |
+| Algolia DocSearch (Pagefind 대체)           | $0 (OSS 무료 신청) | 도큐 페이지 50+                 |
+| Open Collective                             | $0                 | 후원 의사 표시 받았을 때        |
+| MCP 서버 (`packages/mcp`) 출시              | —                  | v1 (Phase F)                    |
+| 셀프호스트 dashboard (`packages/dashboard`) | —                  | v1 (Phase F)                    |
 
 ---
 

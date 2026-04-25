@@ -67,21 +67,23 @@ export async function chatCommand(options: ChatOptions): Promise<void> {
 
   const context = await loadLoreContext(cwd, config.flows.dir);
   if (!context) {
-    log.warn('No .lore content found — running without project context. Run `lore sync` first for richer answers.');
+    log.warn(
+      'No .lore content found — running without project context. Run `lore sync` first for richer answers.',
+    );
   } else {
     log.info(`Loaded ${context.length.toLocaleString()} chars of project context (cached).`);
   }
 
-  log.info(`Lore chat — model=${config.llm.model}. Type "exit" to quit, blank line to abort current input.`);
+  log.info(
+    `Lore chat — model=${config.llm.model}. Type "exit" to quit, blank line to abort current input.`,
+  );
   log.divider();
 
   const client = new Anthropic({ apiKey });
   const history: Anthropic.MessageParam[] = [];
   const rl = readline.createInterface({ input, output });
 
-  const systemBlocks: Anthropic.TextBlockParam[] = [
-    { type: 'text', text: SYSTEM_INSTRUCTION },
-  ];
+  const systemBlocks: Anthropic.TextBlockParam[] = [{ type: 'text', text: SYSTEM_INSTRUCTION }];
   if (context) {
     systemBlocks.push({
       type: 'text',

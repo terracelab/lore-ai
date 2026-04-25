@@ -9,6 +9,7 @@ pnpm changeset
 ```
 
 프롬프트:
+
 1. 영향받는 패키지 선택
 2. 변경 유형 (`major` / `minor` / `patch`)
 3. 한 줄 요약 (CHANGELOG 에 그대로 노출)

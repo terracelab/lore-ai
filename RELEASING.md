@@ -75,11 +75,11 @@ git push --follow-tags
 
 ## 3. SemVer 가이드
 
-| 변경 | 버전 |
-|------|------|
+| 변경                                                            | 버전      |
+| --------------------------------------------------------------- | --------- |
 | public API 깨짐 (`lore.config.yaml` 스키마 변경, CLI 인자 제거) | **major** |
-| 신규 커맨드/옵션, frontmatter 필드 추가 | **minor** |
-| 버그 수정, 메시지 개선 | **patch** |
+| 신규 커맨드/옵션, frontmatter 필드 추가                         | **minor** |
+| 버그 수정, 메시지 개선                                          | **patch** |
 
 `0.x` 동안은 minor 도 깨질 수 있다고 명시 (README · CHANGELOG 헤더에).
 
@@ -96,7 +96,7 @@ git push --follow-tags
 
 CVE 가 보고되면:
 
-1. 비공개 patch 브랜치 (GitHub Security Advisory 의 *Draft fix*)
+1. 비공개 patch 브랜치 (GitHub Security Advisory 의 _Draft fix_)
 2. 동시에 패치 PR (changesets `patch`)
 3. main 머지 → 즉시 publish (`workflow_dispatch` 로 수동 트리거 가능)
 4. Advisory 공개 + 영향받는 버전 표시
@@ -133,6 +133,7 @@ npm deprecate lore-ai@0.1.5 "Use 0.1.6+ — see CVE-2026-XXXX"
 원인: 이전 publish 가 부분 성공.
 
 해결:
+
 ```bash
 git tag -d <tag>
 git push --delete origin <tag>
@@ -146,6 +147,7 @@ git push --delete origin <tag>
 ### 7.3 monorepo 안의 `workspace:*` 가 그대로 publish 됨
 
 changesets 는 `workspace:` 를 자동으로 실제 버전으로 치환합니다. 안 됐다면:
+
 - `pnpm` 버전이 8+ 인지 확인
 - `.changeset/config.json` 의 `updateInternalDependencies: "patch"` 확인
 

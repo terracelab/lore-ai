@@ -7,7 +7,8 @@ export function renderL3(ann: Annotation): string {
   const head = `### \`${ann.symbol ?? `${ann.file}:${ann.line}`}\``;
   const meta = `_${ann.file}:${ann.line}_`;
   const out: string[] = [head, '', meta, ''];
-  if (ann.domains.length) out.push(`- **Domain**: ${ann.domains.map((d) => `\`${d}\``).join(', ')}`);
+  if (ann.domains.length)
+    out.push(`- **Domain**: ${ann.domains.map((d) => `\`${d}\``).join(', ')}`);
   if (ann.businessLogic) out.push(`- **Logic**: ${ann.businessLogic}`);
   if (ann.context) out.push(`- **Context**: ${ann.context}`);
   if (ann.flows?.length) out.push(`- **Flows**: ${ann.flows.map((f) => `\`${f}\``).join(', ')}`);
@@ -36,8 +37,7 @@ export function renderFrontmatter(meta: FlowMeta): string {
   if (meta.tags?.length) lines.push(`tags: [${meta.tags.join(', ')}]`);
   if (meta.last_reviewed) lines.push(`last_reviewed: ${meta.last_reviewed}`);
   if (meta.source_commit) lines.push(`source_commit: ${meta.source_commit}`);
-  if (typeof meta.source_files === 'number')
-    lines.push(`source_files: ${meta.source_files}`);
+  if (typeof meta.source_files === 'number') lines.push(`source_files: ${meta.source_files}`);
   lines.push('---');
   return lines.join('\n');
 }
@@ -74,7 +74,9 @@ export function renderIndex(project: string, entries: IndexEntry[]): string {
     '|---|------|-------|-----|------|',
   ];
   sorted.forEach((e, i) => {
-    lines.push(`| ${i + 1} | \`${e.slug}\` | ${e.icon} | ${e.title} | [${e.slug}.md](${e.slug}.md) |`);
+    lines.push(
+      `| ${i + 1} | \`${e.slug}\` | ${e.icon} | ${e.title} | [${e.slug}.md](${e.slug}.md) |`,
+    );
   });
   return lines.join('\n') + '\n';
 }

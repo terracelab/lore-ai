@@ -59,20 +59,21 @@ Node.js 18.18+ 필요.
 
 ## 핵심 커맨드
 
-| 커맨드 | 목적 |
-|--------|------|
-| `lore init` | `lore.config.yaml` 생성 + 훅 설치 |
-| `lore check [files...]` | precommit 주석 검증 |
-| `lore sync` | 코드 스캔 → L2/L3 마크다운 생성 |
-| `lore synthesize <cat>` | LLM 으로 L2 flow 재구성 |
-| `lore publish` | Lore Board 에 문서 동기화 |
-| `lore chat` | 로컬 RAG Q&A |
+| 커맨드                  | 목적                              |
+| ----------------------- | --------------------------------- |
+| `lore init`             | `lore.config.yaml` 생성 + 훅 설치 |
+| `lore check [files...]` | precommit 주석 검증               |
+| `lore sync`             | 코드 스캔 → L2/L3 마크다운 생성   |
+| `lore synthesize <cat>` | LLM 으로 L2 flow 재구성           |
+| `lore publish`          | Lore Board 에 문서 동기화         |
+| `lore chat`             | 로컬 RAG Q&A                      |
 
 전체 레퍼런스는 **[CLI Docs](https://docs.lore-ai.vercel.app/cli/init)** 참고.
 
 ## 어노테이션 예시
 
 **Python (Django)**
+
 ```python
 class Subscription(models.Model):
     """
@@ -85,6 +86,7 @@ class Subscription(models.Model):
 ```
 
 **TypeScript (React / RN)**
+
 ```tsx
 /**
  * @Domain auth/profile

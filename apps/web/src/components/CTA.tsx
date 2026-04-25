@@ -4,12 +4,8 @@ export function CTA() {
   return (
     <section className="border-t border-border/60">
       <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-        <h2 className="text-3xl font-semibold tracking-tight">
-          5분이면 시작합니다.
-        </h2>
-        <p className="mt-3 text-muted">
-          MIT · 무료 · 의존성 최소. 첫 sync 까지 60초가 목표입니다.
-        </p>
+        <h2 className="text-3xl font-semibold tracking-tight">5분이면 시작합니다.</h2>
+        <p className="mt-3 text-muted">MIT · 무료 · 의존성 최소. 첫 sync 까지 60초가 목표입니다.</p>
         <div className="mt-8 flex justify-center">
           <CopyableCommand command="npx lore-ai init" />
         </div>

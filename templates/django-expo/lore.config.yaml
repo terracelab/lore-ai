@@ -5,29 +5,29 @@ projects:
     root: ./backend
     language: python
     include:
-      - "**/views.py"
-      - "**/views/*.py"
-      - "**/models.py"
-      - "**/services.py"
-      - "**/tasks/*.py"
-      - "**/celery_beat/tasks/*.py"
+      - '**/views.py'
+      - '**/views/*.py'
+      - '**/models.py'
+      - '**/services.py'
+      - '**/tasks/*.py'
+      - '**/celery_beat/tasks/*.py'
     exclude:
-      - "**/__init__.py"
-      - "**/tests.py"
-      - "**/migrations/**"
+      - '**/__init__.py'
+      - '**/tests.py'
+      - '**/migrations/**'
 
   client:
     root: ./app
     language: typescript
     include:
-      - "app/**/*.{ts,tsx}"
-      - "components/**/*.{ts,tsx}"
-      - "hooks/**/*.ts"
-      - "stores/**/*.ts"
-      - "controllers/**/*.ts"
+      - 'app/**/*.{ts,tsx}'
+      - 'components/**/*.{ts,tsx}'
+      - 'hooks/**/*.ts'
+      - 'stores/**/*.ts'
+      - 'controllers/**/*.ts'
     exclude:
-      - "**/*.test.*"
-      - "**/node_modules/**"
+      - '**/*.test.*'
+      - '**/node_modules/**'
 
 domains:
   auth:

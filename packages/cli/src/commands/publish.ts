@@ -62,7 +62,13 @@ export async function publishCommand(options: PublishOptions): Promise<void> {
     return;
   }
 
-  const destDir = resolve(target.replace(/^~/, process.env.HOME ?? '~'), 'content', 'projects', project, 'flows');
+  const destDir = resolve(
+    target.replace(/^~/, process.env.HOME ?? '~'),
+    'content',
+    'projects',
+    project,
+    'flows',
+  );
 
   if (options.dryRun) {
     log.info(`[dry-run] would copy ${files.length} file(s) to:`);

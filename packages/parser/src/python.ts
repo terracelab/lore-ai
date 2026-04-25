@@ -25,7 +25,10 @@ export function pythonSubstantive(source: string, threshold: number): Substantiv
     if (STRING_DOC.test(line)) {
       // single-line docstring like `"""x"""` doesn't toggle
       const m = line.trim();
-      if ((m.startsWith('"""') && m.endsWith('"""') && m.length > 6) || (m.startsWith("'''") && m.endsWith("'''") && m.length > 6)) {
+      if (
+        (m.startsWith('"""') && m.endsWith('"""') && m.length > 6) ||
+        (m.startsWith("'''") && m.endsWith("'''") && m.length > 6)
+      ) {
         continue;
       }
       inDoc = true;

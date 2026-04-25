@@ -44,10 +44,12 @@ lore sync           ← .lore/flows/<카테고리>.md 생성
 `projects.*.include` 에 들어있지 않더라도, **인접한 디렉토리 / 형제 저장소** 가 다른 종류의 프로젝트로 보이면 별도 evidence 섹션으로 surface 합니다.
 
 탐지 대상:
+
 - `cwd` 의 자식 디렉토리 (Turborepo/모노레포 루트에서 실행된 경우)
 - `cwd` 의 형제 디렉토리 (`../nuri-app` 처럼 분리된 저장소)
 
 분류 신호:
+
 - `package.json` 의 `dependencies.{expo, react-native, next, react}` → 각각 `expo` / `react-native` / `next` / `react`
 - `manage.py` → `django`
 
@@ -71,7 +73,7 @@ lore sync           ← .lore/flows/<카테고리>.md 생성
 
 1. 프롬프트를 Claude Code / Cursor / Copilot 에 붙여넣기
 2. AI 가 두 파일 (`lore.config.yaml` 의 `domains:` 블록 + `.lore/DOMAIN_MAP.md` 전체) 의 diff 를 응답으로 줌
-3. **그 응답을 받은 직후** AI 에게 *"위 diff 를 실제로 두 파일에 적용해줘"* 한 번 더 지시 — Claude Code 는 Edit/Write 툴로 직접 파일을 고침
+3. **그 응답을 받은 직후** AI 에게 _"위 diff 를 실제로 두 파일에 적용해줘"_ 한 번 더 지시 — Claude Code 는 Edit/Write 툴로 직접 파일을 고침
 4. `git diff lore.config.yaml .lore/DOMAIN_MAP.md` 로 육안 검증
 5. `lore check` 가 ✓ 로 떨어지면 1차 정상
 
@@ -103,7 +105,7 @@ You are bootstrapping the Lore AI domain map for this workspace.
 
 ## `--heuristic-only` (AI 없이)
 
-API key 가 없거나 즉시 결과가 필요할 때 — 폴더 이름만으로 도메인 후보 + subdomains 초안. 결과는 거칠지만 *완전히 빈 시드* 보다 빠른 시작.
+API key 가 없거나 즉시 결과가 필요할 때 — 폴더 이름만으로 도메인 후보 + subdomains 초안. 결과는 거칠지만 _완전히 빈 시드_ 보다 빠른 시작.
 
 ```yaml
 domains:
@@ -121,17 +123,17 @@ sibling 이 감지되면 `projects:` 추가 후보도 함께 출력:
 ```yaml
 # 추가 후보 — `projects:` 블록에 다음 항목 추가 검토:
 
-  nuri-app:
-    root: ../nuri-app
-    language: typescript
-    include:
-      - "src/pages/**/*.{ts,tsx}"
-      - "src/components/**/*.{ts,tsx}"
-      - "src/stores/**/*.{ts,tsx}"
-      - "src/api/**/*.{ts,tsx}"
-    exclude:
-      - "**/*.test.*"
-      - "**/node_modules/**"
+nuri-app:
+  root: ../nuri-app
+  language: typescript
+  include:
+    - 'src/pages/**/*.{ts,tsx}'
+    - 'src/components/**/*.{ts,tsx}'
+    - 'src/stores/**/*.{ts,tsx}'
+    - 'src/api/**/*.{ts,tsx}'
+  exclude:
+    - '**/*.test.*'
+    - '**/node_modules/**'
 ```
 
 이후 사람이 한국어 라벨 / subdomain 정제 / 한 줄 설명만 채우면 됨.
@@ -144,11 +146,11 @@ Anthropic SDK 호출 → 응답을 파싱 → `lore.config.yaml` 의 `domains:` 
 
 ## 옵션
 
-| 플래그 | 기본 | 설명 |
-|--------|------|------|
+| 플래그             | 기본  | 설명                                       |
+| ------------------ | ----- | ------------------------------------------ |
 | `--heuristic-only` | false | AI 없이 정적 초안 (yaml + DOMAIN_MAP) 출력 |
-| `--out <path>` | — | 프롬프트를 파일로 (기본은 stdout) |
-| `--apply` | false | v0.2 — LLM 직접 호출 + 자동 작성 |
+| `--out <path>`     | —     | 프롬프트를 파일로 (기본은 stdout)          |
+| `--apply`          | false | v0.2 — LLM 직접 호출 + 자동 작성           |
 
 ## 트러블슈팅
 
@@ -169,7 +171,7 @@ git ls-files '<glob>' | head
 
 - `__init__.py` 만 있고 다른 파일이 없는 dummy 패키지 → `exclude` 에 잡혀서 제외됨 (정상)
 - `models/`, `views/`, `services/` 디렉토리도 아니고 카테고리 식별자가 없는 비표준 레이아웃 → include 패턴을 추가하거나 직접 도메인에 등록
-- `config/`, `core/` 같은 *인프라성* 이름 → 명시적으로 제외 (도메인이 아니라 설정/공통)
+- `config/`, `core/` 같은 _인프라성_ 이름 → 명시적으로 제외 (도메인이 아니라 설정/공통)
 
 ### subdomain 이 너무 일반적 (`api`, `service`)
 

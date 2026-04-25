@@ -24,8 +24,7 @@ const personas: Persona[] = [
       'README 는 썩고, Notion 은 갱신을 못 따라가고, git blame 은 *왜* 를 말해주지 않습니다. 이 셋의 공통점 — 도메인 지식이 코드와 분리된 어딘가에 있다는 것.',
       'Lore 는 `@Domain` · `@BusinessLogic` · `@History` 어노테이션을 통해 휘발되는 맥락을 **코드 옆에 물리적으로 결합 (Inline)** 합니다. precommit 훅이 누락을 차단하므로, 기록은 선택이 아니라 의무가 됩니다.',
     ],
-    pullquote:
-      '@History: - 2024-03-15: trial 7일 → 14일 (기존 가입자 백필 없음)',
+    pullquote: '@History: - 2024-03-15: trial 7일 → 14일 (기존 가입자 백필 없음)',
   },
   {
     id: 'chronicler',
@@ -44,8 +43,7 @@ const personas: Persona[] = [
     number: '03',
     english: 'The Cartographer',
     korean: '지도 제작자',
-    tagline:
-      'AI 에이전트가 도메인 정책을 어기지 않도록, 위계질서 있는 지식 지도를 제공합니다.',
+    tagline: 'AI 에이전트가 도메인 정책을 어기지 않도록, 위계질서 있는 지식 지도를 제공합니다.',
     body: [
       'AI 에디터에 마크다운 한 묶음을 던져준다고 해서 좋은 코드가 나오지 않습니다. 단순한 텍스트 덤프는 AI 의 추측을 막지 못합니다.',
       'Lore 의 **L1 도메인 지도 / L2 플로우 서사 / L3 심볼 팩트** 위계는 AI 에게 의미 단위로 청킹된 지식을 제공합니다. 결과: AI 가 도메인 가드레일 안에서 추론합니다 — 정책을 어기는 멍청한 제안 차단.',
@@ -66,8 +64,8 @@ export function Story() {
             세 명의 페르소나, <span className="text-primary">하나의 시스템</span>
           </h2>
           <p className="mt-4 text-pretty text-muted">
-            Lore 는 단일 도구가 아닙니다. 코드베이스에서 휘발되는 세 가지를 각각
-            붙잡는 세 개의 힘이 한 시스템 안에서 함께 작동합니다.
+            Lore 는 단일 도구가 아닙니다. 코드베이스에서 휘발되는 세 가지를 각각 붙잡는 세 개의 힘이
+            한 시스템 안에서 함께 작동합니다.
           </p>
         </div>
 
@@ -79,12 +77,11 @@ export function Story() {
 
         <div className="mt-20 rounded-lg border border-border bg-fg/[.02] p-8">
           <p className="text-balance text-lg leading-relaxed">
-            셋이 합쳐지면 AI 에디터는 비로소{' '}
-            <span className="font-mono text-primary">why</span> 를 안다.
+            셋이 합쳐지면 AI 에디터는 비로소 <span className="font-mono text-primary">why</span> 를
+            안다.
             <span className="text-muted">
               {' '}
-              — 그리고 6개월 뒤의 분석가도, 새로 합류한 동료도,
-              마이그레이션을 디버깅하는 시니어도.
+              — 그리고 6개월 뒤의 분석가도, 새로 합류한 동료도, 마이그레이션을 디버깅하는 시니어도.
             </span>
           </p>
         </div>
@@ -104,15 +101,11 @@ function Vignette({ persona, index }: { persona: Persona; index: number }) {
     >
       <div>
         <div className="font-mono text-xs text-muted">{persona.number}</div>
-        <h3 className="mt-1 text-2xl font-semibold tracking-tight">
-          {persona.english}
-        </h3>
+        <h3 className="mt-1 text-2xl font-semibold tracking-tight">{persona.english}</h3>
         <div className="mt-1 text-sm text-muted">{persona.korean}</div>
       </div>
       <div className="space-y-4">
-        <p className="text-pretty text-lg italic text-fg/90">
-          {persona.tagline}
-        </p>
+        <p className="text-pretty text-lg italic text-fg/90">{persona.tagline}</p>
         {persona.body.map((para, j) => (
           <p key={j} className="text-pretty text-muted">
             {renderInline(para)}
