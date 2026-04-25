@@ -96,6 +96,7 @@ lore sync       ← .lore/flows/<카테고리>.md 생성
 |------|------|
 | \`lore init\` | 워크스페이스 셋업 |
 | \`lore bootstrap\` | 코드 → 도메인 맵 + projects: 초안 (LLM 프롬프트 출력) |
+| \`lore bootstrap > prompt.md\` | 프롬프트를 파일로 저장 (Claude Code 에 붙여넣기용) |
 | \`lore bootstrap --heuristic-only\` | AI 없이 정적 초안 |
 | \`lore check\` | 모든 configured projects 전체 검증 |
 | \`lore check <files…>\` | 명시 파일만 검증 (precommit 용) |
@@ -145,6 +146,10 @@ export default function ProfileCard({ userInfo }: Props) { ... }
 ## 일상 워크플로
 
 \`\`\`bash
+# 도메인 맵 초안 (최초 셋업)
+lore bootstrap > prompt.md                # → Claude Code 에 붙여넣기
+lore bootstrap | pbcopy                   # macOS — 바로 클립보드로
+
 # 코드 변경 후
 lore check                                # 전체 스캔
 lore sync                                 # .lore/flows/ 갱신
