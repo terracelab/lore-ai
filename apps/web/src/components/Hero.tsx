@@ -20,8 +20,16 @@ export function Hero() {
           AI 가 <span className="text-primary">왜 이렇게 짰는지</span> 알게 하라
         </h1>
         <p className="mx-auto mt-6 max-w-prose text-pretty text-lg text-muted">
-          Lore AI 는 코드 옆 비즈니스 로직 주석을 추출해 Claude Code · Copilot · Cursor 가
-          도메인 맥락을 이해하게 만드는 CLI + 패키지입니다.
+          시니어의 머릿속에만 있던 도메인 지식을 코드 옆에 박제하고, 자동 추출해
+          Claude Code · Copilot · Cursor 에 컨텍스트로 흘려보내는 CLI + 패키지.
+        </p>
+        <p className="mx-auto mt-3 max-w-prose text-sm text-muted/80">
+          <span className="font-mono text-primary">@Domain</span>
+          <span className="mx-2">·</span>
+          <span className="font-mono text-primary">@BusinessLogic</span>
+          <span className="mx-2">·</span>
+          <span className="font-mono text-primary">@History</span>
+          <span className="ml-2">— 세 태그면 충분합니다.</span>
         </p>
 
         <div className="mt-10 flex justify-center">
