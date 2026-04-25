@@ -12,8 +12,8 @@ pnpm --filter docs dev
 
 ## Add a page
 
-1. Create `content/<section>/<page>.mdx`
-2. Add the page key to `content/<section>/_meta.ts`
+1. Create `pages/<section>/<page>.mdx`
+2. Add the page key to `pages/<section>/_meta.ts`
 3. (Optional) Add a hand-written nav title or alias
 
 ## Deploy (Vercel)
