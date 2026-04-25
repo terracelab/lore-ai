@@ -25,9 +25,9 @@ export interface SynthesizeAllInput {
   recentDiff?: string;
 }
 
-const L2_DOCTRINE = `# Required L2 structure (8-section skeleton)
+const L2_DOCTRINE = `# Required L2 structure (9-section skeleton)
 
-각 flow 파일은 아래 8섹션 골격을 그대로 따른다. 카테고리에 해당 정보가 전혀 없는 섹션이라도 \`_(해당 없음)_\` 으로 명시하고 섹션 자체는 생략하지 않는다.
+각 flow 파일은 아래 9섹션 골격을 그대로 따른다. 카테고리에 해당 정보가 전혀 없는 섹션이라도 \`_(해당 없음)_\` 으로 명시하고 섹션 자체는 생략하지 않는다.
 
 \`\`\`markdown
 # <icon> <slug> — <한국어 라벨> (L2 Flow)
@@ -40,47 +40,62 @@ const L2_DOCTRINE = `# Required L2 structure (8-section skeleton)
 서버/클라이언트 파일 풀리스트. 파일당 한 줄 책임 요약. 각 파일은 \`[name](path)\` 마크다운 링크.
 
 ## 2. 데이터 모델
-- ASCII ER 다이어그램 (테이블·FK·UNIQUE 제약 표시)
-- 핵심 필드 제약 표: \`| 필드 | 규칙/비고 |\`
+- **ASCII ER 다이어그램**: 테이블 · FK 화살표 · UNIQUE/INDEX 제약을 박스/화살표로 그린다 (예: \`User ──< OneToMany ──< CandidateAIProfile\`).
+- **핵심 필드 제약 표** (필수): \`| 필드 | 타입 | 제약 / 비고 |\`. 모든 비-자명 필드 (FK, UNIQUE, NULL 정책, default) 를 한 행씩.
 
 ## 3. 엔드포인트 (서버 카테고리에 한함)
-5컬럼 표: \`| Method | Path | View/Handler | 권한 | 핵심 로직 |\`. 한 행 = 한 엔드포인트.
+5컬럼 표 (필수): \`| Method | Path | View/Handler | 권한 | 핵심 로직 |\`. 한 행 = 한 엔드포인트. 권한은 데코레이터/permission_classes 에서 그대로 인용.
 
 ## 4. 대표 플로우
-\`4.1\`, \`4.2\` ... 번호 매긴 순차 단계. 각 단계 = 한 함수 / 한 액션 / 한 사이드이펙트. 단계 안에서 서버 ↔ 클라이언트 호출 매핑을 명시 (예: \`POST /user/login/ → AuthProvider.login()\`).
+\`4.1\`, \`4.2\` ... 번호 매긴 순차 단계. 각 단계 = 한 함수 / 한 액션 / 한 사이드이펙트.
+**Connection 매핑 명시** (다음 형식 중 하나 이상):
+- \`POST /user/login/ → AuthProvider.login() → authStore.setTokens()\`
+- \`Candidate.post_save signal → ai_profile_generator.generate_ai_profile() → CandidateAIProfile.update_or_create\`
+\`@Connection\` 어노테이션이 있으면 그 내용을 1차 재료로 사용. 없으면 코드 단서로 추론.
 
 ## 5. 권한·데코레이터 패턴
-auth/permission 데코레이터·미들웨어·가드 정리.
+auth / permission 데코레이터 · 미들웨어 · 가드 정리. \`@subscription_required\` 같은 커스텀 데코레이터는 정의 위치까지 링크.
 
 ## 6. 클라이언트 상태 (클라이언트 카테고리에 한함)
-store / context / hook / route guard 구조.
+store / context / hook / route guard 구조. zustand/redux store 의 상태 트리 + 어느 컴포넌트가 어느 selector 를 쓰는지.
 
 ## 7. 정책 — 확정 vs 확인 필요 vs TBD
-세 분류로 명시 분리:
+세 분류로 **명시 분리**:
 - **확정** — 코드에서 명시적으로 추론 가능한 정책
 - **⚠️ 확인 필요** — 코드만으로 단정 어려움 / 보안·금융·개인정보 리스크 후보 / 의도 불명한 default
 - **TBD** — 담당자 정책 인터뷰 필요
 
-## 8. 관련 파일 인덱스
-서버/클라이언트 풀리스트 (\`[file:line](path#Lline)\` 링크).
+## 8. 변경 이력 (\`@History\`)
+카테고리에 속한 모든 \`@History\` 엔트리를 **시간 순으로** 모은 타임라인 (필수 — \`@History\` 가 1건이라도 있으면 절대 생략 금지). 형식:
+\`\`\`
+- **YYYY[-MM[-DD]]** — <변경 내용> _(심볼: [\`SymbolName\`](path#Lline))_
+\`\`\`
+같은 날짜·관련 변경은 묶어서 한 줄로. 의사결정 배경 (특허·외부 서비스 등) 도 그대로 보존.
+
+## 9. 관련 파일 인덱스
+서버/클라이언트 풀리스트 (\`[file:line](path#Lline)\` 링크). 1번 섹션과 중복돼도 괜찮음 — 1번은 책임 요약, 9번은 라인까지 내려간 풀 인덱스.
 \`\`\`
 
 # Style — must
 
-- 표 · ASCII 다이어그램 · 번호 매긴 단계 적극 사용. **한두 문장의 평면 산문 H2 금지** — 그런 섹션은 표나 번호 단계로 재구조화한다.
+- **표 · ASCII 다이어그램 · 번호 매긴 단계 적극 사용**. 한두 문장의 평면 산문 H2 는 금지 — 그런 섹션은 표나 번호 단계로 재구조화한다.
 - 각 섹션은 L3 facts 가 허용하는 한 최대한 상세하게 (얇은 한두 줄 H2 금지).
 - 코드 참조는 \`[symbol:line](path#Lline)\` 마크다운 링크.
 - ⚠️ 마커는 정책 검토 필요 / 보안·금융·개인정보 리스크 후보 / 의도 불명한 default 에만. 남발 금지.
 - existing body 와 비교해 삭제·이동된 기능은 반드시 제거 (out-of-date 청소).
 - raw annotation 덤프 금지 — 사실을 서술 문장 + 표로 재구성.
+- \`@History\` 와 \`@Connection\` 의 텍스트는 **반드시 보존** (요약하더라도 의사결정 배경 단어를 유지).
 
-# Connection 추론 (어노테이션 태그가 없어도 derive)
+# Connection 사용
 
-다음 연결은 어노테이션이 없어도 코드 단서로 추론해 4번 (대표 플로우) 또는 8번 (파일 인덱스) 섹션에 명시한다:
+L3 facts 의 \`**Connection**\` 블록 (소스 어노테이션의 \`@Connection\` 태그) 이 1차 재료. 거기 적힌:
+- \`FK: ...\`, \`Writer: ...\`, \`Reader: ...\`, \`Caller: ...\` 같은 라인은 4번 (대표 플로우) 또는 9번 (파일 인덱스) 의 직접 자료.
+- \`Server-only\` 같은 노트는 7번 (정책) 의 ⚠️ 또는 확정 항목으로 변환.
 
-- **엔드포인트 ↔ 화면/페이지/스토어 액션** 매핑 (예: \`POST /user/login/ → LoginPageContent / AuthProvider.login\`)
+\`@Connection\` 어노테이션이 없어도 코드 단서로 다음을 추론:
+- **엔드포인트 ↔ 화면/페이지/스토어 액션** 매핑
 - **모델 ↔ 다른 모델의 FK / 참조** 관계
-- **서버 background task / scheduler ↔ 트리거 모델·이벤트**
+- **서버 background task / scheduler / signal ↔ 트리거 모델·이벤트**
 - **React 컴포넌트 ↔ 사용 hook ↔ API 클라이언트 함수** 체인
 
 추론 근거가 약하면 ⚠️ 와 함께 표시.

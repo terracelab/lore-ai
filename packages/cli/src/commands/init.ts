@@ -108,14 +108,15 @@ lore sync       ← .lore/flows/<카테고리>.md 생성
 | \`lore publish\` | Lore Board 에 동기화 |
 | \`lore chat\` | 로컬 RAG REPL (v0.2 예정) |
 
-## 어노테이션 7개 (다른 이름 만들지 마세요)
+## 어노테이션 8개 (다른 이름 만들지 마세요)
 
 | 태그 | 등급 | 용도 |
 |------|------|------|
 | \`@Domain\` | 필수 | \`<token>\` 또는 \`<token>/<sub>\`. lore.config.yaml 의 \`domains:\` 에 등록된 토큰만 |
 | \`@BusinessLogic\` | 필수 | 한 줄 요약 |
-| \`@History\` | 조건부 | 데이터/정책 의미 변경 시. \`- YYYY-MM-DD: <변경> (백필 여부)\` |
+| \`@History\` | 조건부 | 데이터/정책 의미 변경 시. \`- YYYY[-MM[-DD]]: <변경>\` (연·연월·전체 날짜 모두 허용) |
 | \`@Context\` | 선택 | 의사결정 배경 |
+| \`@Connection\` | 선택 | FK·Writer·Reader·Caller 등 심볼 연결 (multi-line bullet) |
 | \`@Flow\` | 선택 | flow id |
 | \`@MigratedFrom\` | 선택 | 이전 위치 |
 | \`@SeeAlso\` | 선택 | 관련 심볼 |
@@ -251,7 +252,7 @@ export async function initCommand(options: InitOptions): Promise<void> {
   log.hint('2. (코드에 @Domain · @BusinessLogic 어노테이션 작성)');
   log.hint('3. lore check && lore sync  # 검증 + .lore/flows/<카테고리>.md 생성');
   log.hint('');
-  log.hint('명령어 / 어노테이션 7개 / 워크플로 한눈에 — `.lore/COMMANDS.md` 참고.');
+  log.hint('명령어 / 어노테이션 8개 / 워크플로 한눈에 — `.lore/COMMANDS.md` 참고.');
   log.hint('');
   log.hint('AI 에디터 가드레일 (선택):');
   log.hint('  CLAUDE.md (Claude Code), .cursor/rules/lore.mdc, .github/copilot-instructions.md');

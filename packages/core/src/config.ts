@@ -13,6 +13,7 @@ const projectSchema = z.object({
 
 const domainSchema = z.object({
   label: z.string(),
+  icon: z.string().optional(),
   subdomains: z.array(z.string()).default([]),
 });
 
