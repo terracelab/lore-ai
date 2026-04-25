@@ -109,7 +109,6 @@ export async function chatCommand(options: ChatOptions): Promise<void> {
         const stream = client.messages.stream({
           model: config.llm.model,
           max_tokens: 4096,
-          temperature: config.llm.temperature,
           system: systemBlocks,
           messages: history,
         });
