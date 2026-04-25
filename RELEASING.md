@@ -26,7 +26,7 @@
                 ▼
   changesets bot opens "Version Packages" PR
         - bumps versions
-        - aggregates CHANGELOG.md
+        - updates per-package CHANGELOG.md
                 │
                 ▼
    메인테이너: 그 PR 리뷰 → merge
