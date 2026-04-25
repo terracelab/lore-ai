@@ -1,6 +1,6 @@
 {
   "name": "@lore-ai-automation/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Core engine for Lore AI: annotation parser, config loader, markdown synthesizer, checker.",
   "license": "MIT",
   "author": "Terracelab <oss@terracelab.co.kr>",
@@ -41,7 +41,11 @@
       "import": "./dist/bootstrap.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=18.18.0"
   },
@@ -68,5 +72,11 @@
     "typescript": "^5.5.4",
     "vitest": "^2.1.1"
   },
-  "keywords": ["lore-ai", "documentation", "ai", "parser", "annotations"]
+  "keywords": [
+    "lore-ai",
+    "documentation",
+    "ai",
+    "parser",
+    "annotations"
+  ]
 }
