@@ -38,3 +38,6 @@ Thumbs.db
 
 # pagefind
 pagefind/
+
+# tmp
+tmp/
