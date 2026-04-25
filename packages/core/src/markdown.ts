@@ -14,6 +14,11 @@ export function renderL3(ann: Annotation): string {
   if (ann.flows?.length) out.push(`- **Flows**: ${ann.flows.map((f) => `\`${f}\``).join(', ')}`);
   if (ann.migratedFrom) out.push(`- **MigratedFrom**: ${ann.migratedFrom}`);
   if (ann.seeAlso?.length) out.push(`- **SeeAlso**: ${ann.seeAlso.join(', ')}`);
+  if (ann.connection?.length) {
+    out.push('');
+    out.push('**Connection**');
+    for (const c of ann.connection) out.push(`- ${c}`);
+  }
   if (ann.history?.length) {
     out.push('');
     out.push('**History**');

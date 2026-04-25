@@ -9,7 +9,7 @@ import {
   renderIndex,
   renderL3,
 } from '@lore-ai-automation/core';
-import type { Annotation, FlowMeta, ProjectConfig } from '@lore-ai-automation/core';
+import type { Annotation, DomainConfig, FlowMeta, ProjectConfig } from '@lore-ai-automation/core';
 import { log } from '../util/log.js';
 
 interface SyncOptions {
@@ -17,21 +17,53 @@ interface SyncOptions {
   dryRun?: boolean;
 }
 
-const ICONS: Record<string, string> = {
+const BUILTIN_ICONS: Record<string, string> = {
   auth: '🔐',
+  user: '👤',
+  account: '👤',
   subscription: '💳',
+  payment: '💸',
+  billing: '💸',
   signal: '📘',
   notification: '🔔',
-  payment: '💸',
+  notice: '📢',
+  job: '💼',
+  candidate: '🧑‍💼',
+  attendance: '🗓️',
+  schedule: '🗓️',
+  scheduler: '⏰',
+  security: '🛡️',
+  admin: '🛠️',
+  monitoring: '📊',
+  analytics: '📊',
+  stock: '📈',
+  market: '📈',
+  community: '💬',
+  chat: '💬',
+  content: '📰',
+  marketing: '📣',
+  api: '🔌',
+  infra: '🏗️',
   default: '📂',
 };
+
+// Stable hash-based fallback so each unmapped slug still gets a distinct icon
+// (vs. every category collapsing onto 📂).
+const FALLBACK_POOL = ['📦', '🧩', '🔧', '🧱', '🗂️', '🧭', '🔖', '🧪', '🧰', '🗃️'];
+
+function fallbackIcon(slug: string): string {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+  return FALLBACK_POOL[h % FALLBACK_POOL.length]!;
+}
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function pickIcon(slug: string): string {
-  return ICONS[slug] ?? ICONS.default!;
+function pickIcon(slug: string, domain?: DomainConfig): string {
+  if (domain?.icon) return domain.icon;
+  return BUILTIN_ICONS[slug] ?? fallbackIcon(slug);
 }
 
 async function gatherFilesFor(project: ProjectConfig, cwd: string): Promise<string[]> {
@@ -82,7 +114,7 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
     const meta: FlowMeta = {
       slug,
       title: domain?.label ?? slug,
-      icon: pickIcon(slug),
+      icon: pickIcon(slug, domain),
       order: indexEntries.length + 1,
       summary: `${domain?.label ?? slug} 카테고리 (${anns.length}개 심볼)`,
       tags: domain?.subdomains,

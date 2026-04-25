@@ -2,23 +2,24 @@
 
 이 워크스페이스는 [Lore AI](https://lore-ai.vercel.app) 어노테이션을 사용합니다.
 새/수정되는 비즈니스 로직 코드 (모델·뷰·서비스·핸들러·React 컴포넌트 등) 는
-**아래 7개 태그만** 사용해야 합니다. **다른 이름은 절대 만들지 마세요.**
+**아래 8개 태그만** 사용해야 합니다. **다른 이름은 절대 만들지 마세요.**
 
-## 정식 태그 (이 7개만 허용)
+## 정식 태그 (이 8개만 허용)
 
-| 태그             | 등급            | 형식                                      | 예시                                                 |
-| ---------------- | --------------- | ----------------------------------------- | ---------------------------------------------------- |
-| `@Domain`        | **필수**        | `<token>` 또는 `<token>/<sub>` (`,` 다중) | `@Domain: subscription/master`                       |
-| `@BusinessLogic` | **필수**        | 한 줄 (60자 권장)                         | `@BusinessLogic: valid_until 지나면 is_active=False` |
-| `@History`       | **조건부 필수** | `- YYYY-MM-DD: <변경> (백필 여부)` 다중   | `@History:`<br/>`  - 2024-03-15: trial 7일 → 14일`   |
-| `@Context`       | 선택            | 의사결정 배경 한 줄                       | `@Context: trial 후 자동 결제 실패 시 3일 grace`     |
-| `@Flow`          | 선택            | flow id (`,` 다중)                        | `@Flow: auto-renewal, grace-period`                  |
-| `@MigratedFrom`  | 선택            | 이전 위치/이름                            | `@MigratedFrom: legacy.PaymentService`               |
-| `@SeeAlso`       | 선택            | 관련 심볼 (`,` 다중)                      | `@SeeAlso: SubscriptionRenewer, NotifyService`       |
+| 태그             | 등급            | 형식                                                     | 예시                                                                                                  |
+| ---------------- | --------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `@Domain`        | **필수**        | `<token>` 또는 `<token>/<sub>` (`,` 다중)                | `@Domain: subscription/master`                                                                        |
+| `@BusinessLogic` | **필수**        | 한 줄 (60자 권장)                                        | `@BusinessLogic: valid_until 지나면 is_active=False`                                                  |
+| `@History`       | **조건부 필수** | `- YYYY[-MM[-DD]]: <변경>` 다중 (연/연월/풀 날짜 모두)   | `@History:`<br/>`  - 2024-03-15: trial 7일 → 14일`                                                    |
+| `@Context`       | 선택            | 의사결정 배경 한 줄                                      | `@Context: trial 후 자동 결제 실패 시 3일 grace`                                                      |
+| `@Connection`    | 선택            | FK·Writer·Reader·Caller 등 심볼 연결 (multi-line bullet) | `@Connection:`<br/>`  - FK: User → reverse: profiles`<br/>`  - Writer: services/x.py:42 generate_x()` |
+| `@Flow`          | 선택            | flow id (`,` 다중)                                       | `@Flow: auto-renewal, grace-period`                                                                   |
+| `@MigratedFrom`  | 선택            | 이전 위치/이름                                           | `@MigratedFrom: legacy.PaymentService`                                                                |
+| `@SeeAlso`       | 선택            | 관련 심볼 (`,` 다중)                                     | `@SeeAlso: SubscriptionRenewer, NotifyService`                                                        |
 
-**위 7개 외의 태그 (`@lore-*`, `@logic`, `@no-side-effects`, `@since`, `@deprecated`,
+**위 8개 외의 태그 (`@lore-*`, `@logic`, `@no-side-effects`, `@since`, `@deprecated`,
 `@author` 등) 를 직접 만들거나 다른 시스템의 관습을 가져오지 마세요.**
-필요한 정보는 위 7개 안에서 자연어로 표현합니다.
+필요한 정보는 위 8개 안에서 자연어로 표현합니다.
 
 ## `@Domain` 토큰 사용 규칙
 

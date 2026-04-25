@@ -1,12 +1,16 @@
 import type { Annotation, AnnotationTag, HistoryEntry, Language } from './types.js';
 
 const TAG_LINE = /^\s*[*#/\s]*@(\w+)\s*[:\s]\s*(.*?)\s*$/;
-const HISTORY_ITEM = /^\s*[*#/\s]*-\s*(\d{4}-\d{2}-\d{2})\s*:\s*(.+?)\s*$/;
+// Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD` dates so partial-date entries
+// (e.g. `- 2025: …`) don't get silently dropped.
+const HISTORY_ITEM = /^\s*[*#/\s]*-\s*(\d{4}(?:-\d{2}(?:-\d{2})?)?)\s*:\s*(.+?)\s*$/;
+const BULLET_ITEM = /^\s*[*#/\s]*-\s*(.+?)\s*$/;
 const VALID_TAGS = new Set<AnnotationTag>([
   'Domain',
   'BusinessLogic',
   'History',
   'Context',
+  'Connection',
   'Flow',
   'MigratedFrom',
   'SeeAlso',
@@ -89,6 +93,7 @@ export function findAnnotationBlocks(source: string, language: Language): RawBlo
 export function parseBlock(block: RawBlock, file: string): Annotation | null {
   const tags: Partial<Record<AnnotationTag, string[]>> = {};
   const history: HistoryEntry[] = [];
+  const connection: string[] = [];
   let currentTag: AnnotationTag | null = null;
 
   for (const rawLine of block.lines) {
@@ -103,6 +108,7 @@ export function parseBlock(block: RawBlock, file: string): Annotation | null {
       const value = (m[2] ?? '').trim();
       if (value) {
         (tags[tagName] ??= []).push(value);
+        if (tagName === 'Connection') connection.push(value);
       }
       continue;
     }
@@ -110,6 +116,13 @@ export function parseBlock(block: RawBlock, file: string): Annotation | null {
       const h = rawLine.match(HISTORY_ITEM);
       if (h && h[1] && h[2]) {
         history.push({ date: h[1], note: h[2].trim() });
+      }
+      continue;
+    }
+    if (currentTag === 'Connection') {
+      const c = rawLine.match(BULLET_ITEM);
+      if (c && c[1]) {
+        connection.push(c[1].trim());
       }
     }
   }
@@ -128,6 +141,7 @@ export function parseBlock(block: RawBlock, file: string): Annotation | null {
     businessLogic,
     context: tags.Context?.[0],
     history: history.length ? history : undefined,
+    connection: connection.length ? connection : undefined,
     flows: tags.Flow?.[0]
       ?.split(',')
       .map((s) => s.trim())

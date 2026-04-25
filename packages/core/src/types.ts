@@ -13,6 +13,7 @@ export type AnnotationTag =
   | 'BusinessLogic'
   | 'History'
   | 'Context'
+  | 'Connection'
   | 'Flow'
   | 'MigratedFrom'
   | 'SeeAlso';
@@ -37,6 +38,8 @@ export interface Annotation {
   // Optional tags
   context?: string;
   history?: HistoryEntry[];
+  /** `@Connection` bullets — endpoint↔screen, model↔FK, task↔trigger mappings. */
+  connection?: string[];
   flows?: string[];
   migratedFrom?: string;
   seeAlso?: string[];
@@ -44,6 +47,8 @@ export interface Annotation {
 
 export interface DomainConfig {
   label: string;
+  /** Optional emoji shown in the L2 frontmatter and INDEX.md. Falls back to a built-in heuristic. */
+  icon?: string;
   subdomains?: string[];
 }
 
