@@ -102,8 +102,8 @@ L3 facts 의 \`**Connection**\` 블록 (소스 어노테이션의 \`@Connection\
 
 # 출력 규약
 
-- 마크다운 본문만, \`\`\` 펜스로 문서를 감싸지 않는다.
-- YAML frontmatter 금지 (CLI 가 prepend 한다).
+- \`\`\` 펜스로 문서 전체를 감싸지 않는다.
+- **YAML frontmatter 는 무조건 포함** (필수). 기존 파일 상단에 \`---\` 으로 시작하는 frontmatter 블록이 있으면 **그대로 보존** 하고 닫는 \`---\` 아래 본문만 새로 작성한다. frontmatter 가 없거나 신규 파일이면 다음 필드를 직접 작성: \`slug\` (카테고리 키) · \`title\` (한국어 라벨) · \`icon\` (이모지) · \`order\` · \`summary\` (한 줄) · \`tags\` (subdomains) · \`last_reviewed\` (오늘 날짜 YYYY-MM-DD). **frontmatter 가 빠진 출력은 잘못된 결과물.**
 - Korean voice, 사실 우선, 두루뭉실 회피.`;
 
 /**
@@ -205,20 +205,33 @@ export function buildSynthesizeAllPrompt(input: SynthesizeAllInput): string {
     '',
     `# Multi-file output framing`,
     '',
-    `Emit ONE rewritten flow per category, using this exact framing:`,
+    `Emit ONE rewritten flow per category, using this exact framing — **frontmatter 포함 필수**:`,
     '',
     `  === FILE: ${flowsDir}/<category>.md ===`,
+    `  ---`,
+    `  slug: <category>`,
+    `  title: <한국어 라벨>`,
+    `  icon: <emoji>`,
+    `  order: <n>`,
+    `  summary: <한 줄 요약>`,
+    `  tags: [<subdomains>]`,
+    `  last_reviewed: <YYYY-MM-DD>`,
+    `  ---`,
+    ``,
     `  # <icon> <slug> — <라벨> (L2 Flow)`,
     `  ## 1. 구성 앱/파일`,
     `  ...`,
-    `  ## 8. 관련 파일 인덱스`,
+    `  ## 9. 관련 파일 인덱스`,
     `  ...`,
     `  === END FILE ===`,
     '',
     `Skip any category whose L3 facts say "(no annotations extracted)".`,
     '',
     `If you are running inside an agent with file-editing tools (e.g. Claude Code),`,
-    `prefer writing each category directly to \`${flowsDir}/<category>.md\` — body only, no frontmatter.`,
+    `write each category directly to \`${flowsDir}/<category>.md\` — **preserve the existing`,
+    `frontmatter (\`---\` block at top) verbatim and replace only the content below the`,
+    `closing \`---\`**. If the file does not yet exist or has no frontmatter, prepend a new`,
+    `frontmatter block per the schema above using L1 metadata + today's date.`,
   ]
     .filter(Boolean)
     .join('\n');

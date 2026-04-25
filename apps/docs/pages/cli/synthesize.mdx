@@ -38,6 +38,10 @@ lore synthesize --apply                  # (v0.2 예정) Anthropic API 호출 + 
 - 서버 background task ↔ 트리거 모델·이벤트
 - React 컴포넌트 ↔ 사용 hook ↔ API 클라이언트 함수
 
+## YAML frontmatter 보존
+
+LLM 출력은 **반드시 frontmatter (`---` 블록) 를 포함**하도록 강제합니다. Claude Code 처럼 파일을 직접 쓰는 에이전트 환경에서는 기존 파일 상단의 frontmatter 를 verbatim 보존하고 닫는 `---` 아래 본문만 새로 작성합니다. 신규 파일이거나 frontmatter 가 없으면 `slug` · `title` · `icon` · `order` · `summary` · `tags` · `last_reviewed` 를 직접 채웁니다. frontmatter 가 빠진 출력은 잘못된 결과물로 간주합니다 — `lore sync` 가 prepend 해주리라 기대하지 않습니다.
+
 ## `--since` git log 번들링
 
 `--since <range>` 를 주면 카테고리 어노테이션이 위치한 디렉토리의 git log 가 프롬프트에 함께 들어갑니다. 파일별로 git 루트를 자동 탐지하므로 **모노레포 / 서브레포 / 멀티레포** 어느 구조든 동작합니다.
