@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises';
-import { resolve, sep } from 'node:path';
+import { readFile, readdir, stat } from 'node:fs/promises';
+import { basename, relative, resolve, sep } from 'node:path';
 import fg from 'fast-glob';
 import type { LoreConfig } from './config.js';
 import type { ProjectConfig } from './types.js';
@@ -44,6 +44,29 @@ export interface ProjectEvidence {
   language: 'python' | 'typescript';
   apps: AppEvidence[];
   groups: FrontendGroup[];
+}
+
+export type SiblingKind =
+  | 'expo'
+  | 'react-native'
+  | 'next'
+  | 'react'
+  | 'django'
+  | 'unknown';
+
+export interface MonorepoSibling {
+  /** path relative to the bootstrap cwd, e.g. "../nuri-app" */
+  path: string;
+  kind: SiblingKind;
+  /** human-readable reason this dir was classified */
+  signal: string;
+  /** top-level dirs found inside (helps suggest include globs) */
+  topDirs: string[];
+}
+
+export interface WorkspaceEvidence {
+  projects: ProjectEvidence[];
+  siblings: MonorepoSibling[];
 }
 
 const PY_CATEGORY_DIRS = new Set([
@@ -202,9 +225,214 @@ export async function gatherEvidence(config: LoreConfig, cwd: string): Promise<P
   return out;
 }
 
+/**
+ * Top-level dir candidates we'll look inside a sibling for, when proposing
+ * include globs to the LLM.
+ */
+const SIBLING_PROBE_DIRS = [
+  // JS/TS layouts
+  'src/pages',
+  'src/app',
+  'src/components',
+  'src/stores',
+  'src/hooks',
+  'src/api',
+  'src/schemas',
+  'src/router',
+  'src/features',
+  'src/screens',
+  'src/modules',
+  'app',
+  'pages',
+  'components',
+  'stores',
+  'hooks',
+  'api',
+  // Python layouts
+  'apps',
+];
+
+const SIBLING_SKIP = new Set([
+  'node_modules',
+  '.git',
+  '.next',
+  '.turbo',
+  'dist',
+  'build',
+  'out',
+  '__pycache__',
+  '.venv',
+  'venv',
+  'env',
+]);
+
+async function readJsonOrNull(path: string): Promise<Record<string, unknown> | null> {
+  try {
+    return JSON.parse(await readFile(path, 'utf8')) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+async function listExistingDirs(root: string): Promise<string[]> {
+  const found: string[] = [];
+  for (const dir of SIBLING_PROBE_DIRS) {
+    try {
+      const s = await stat(resolve(root, dir));
+      if (s.isDirectory()) found.push(dir);
+    } catch {
+      /* not present */
+    }
+  }
+  return found;
+}
+
+async function classifyDir(absolute: string): Promise<{
+  kind: SiblingKind;
+  signal: string;
+} | null> {
+  // package.json takes precedence (frontend signals are most specific)
+  const pkg = await readJsonOrNull(resolve(absolute, 'package.json'));
+  if (pkg) {
+    const deps = {
+      ...(pkg.dependencies as Record<string, string> | undefined),
+      ...(pkg.devDependencies as Record<string, string> | undefined),
+      ...(pkg.peerDependencies as Record<string, string> | undefined),
+    };
+    if (deps.expo) return { kind: 'expo', signal: 'package.json has "expo"' };
+    if (deps['react-native']) {
+      return { kind: 'react-native', signal: 'package.json has "react-native"' };
+    }
+    if (deps.next) return { kind: 'next', signal: 'package.json has "next"' };
+    if (deps.react) return { kind: 'react', signal: 'package.json has "react"' };
+  }
+
+  // Django backend signal
+  try {
+    await stat(resolve(absolute, 'manage.py'));
+    return { kind: 'django', signal: 'has manage.py' };
+  } catch {
+    /* not Django */
+  }
+
+  return null;
+}
+
+async function inspectCandidates(
+  candidateDirs: string[],
+  cwdAbs: string,
+  configuredAbsRoots: Set<string>,
+): Promise<MonorepoSibling[]> {
+  const out: MonorepoSibling[] = [];
+  for (const abs of candidateDirs) {
+    if (configuredAbsRoots.has(abs)) continue;
+    if (abs === cwdAbs) continue;
+    const name = basename(abs);
+    if (name.startsWith('.') || SIBLING_SKIP.has(name)) continue;
+
+    let s;
+    try {
+      s = await stat(abs);
+    } catch {
+      continue;
+    }
+    if (!s.isDirectory()) continue;
+
+    const cls = await classifyDir(abs);
+    if (!cls) continue;
+
+    const topDirs = await listExistingDirs(abs);
+    out.push({
+      path: relative(cwdAbs, abs) || '.',
+      kind: cls.kind,
+      signal: cls.signal,
+      topDirs,
+    });
+  }
+  return out;
+}
+
+/**
+ * Detect monorepo siblings — directories adjacent to (or inside) the
+ * workspace that look like a separate project but are NOT covered by
+ * the current `lore.config.yaml`. Surfaces them as evidence so the
+ * bootstrap prompt can ask the LLM to propose `projects:` additions.
+ *
+ * Looks at:
+ *   - immediate children of cwd (turbo-style monorepo at root)
+ *   - immediate siblings of cwd (separate-repo style: ../nuri-app)
+ */
+export async function detectMonorepoSiblings(
+  config: LoreConfig,
+  cwd: string,
+): Promise<MonorepoSibling[]> {
+  const cwdAbs = resolve(cwd);
+  const configuredAbsRoots = new Set(
+    Object.values(config.projects).map((p) => resolve(cwdAbs, p.root)),
+  );
+
+  const candidates: string[] = [];
+
+  // children of cwd
+  try {
+    const children = await readdir(cwdAbs);
+    for (const c of children) candidates.push(resolve(cwdAbs, c));
+  } catch {
+    /* ignore */
+  }
+
+  // siblings (cwd's parent's children, minus cwd itself)
+  try {
+    const parent = resolve(cwdAbs, '..');
+    const siblings = await readdir(parent);
+    for (const s of siblings) {
+      const abs = resolve(parent, s);
+      if (abs === cwdAbs) continue;
+      candidates.push(abs);
+    }
+  } catch {
+    /* ignore */
+  }
+
+  return inspectCandidates(candidates, cwdAbs, configuredAbsRoots);
+}
+
+/**
+ * One-call workspace bootstrap evidence: projects (configured) + siblings (untracked).
+ */
+export async function gatherWorkspaceEvidence(
+  config: LoreConfig,
+  cwd: string,
+): Promise<WorkspaceEvidence> {
+  const [projects, siblings] = await Promise.all([
+    gatherEvidence(config, cwd),
+    detectMonorepoSiblings(config, cwd),
+  ]);
+  return { projects, siblings };
+}
+
 function trimList(items: string[], max: number): string {
   if (items.length <= max) return items.join(', ');
   return items.slice(0, max).join(', ') + `, … (+${items.length - max})`;
+}
+
+export function renderSiblings(siblings: MonorepoSibling[]): string {
+  if (siblings.length === 0) return '';
+  const lines: string[] = [
+    '# Untracked siblings (NOT in current `lore.config.yaml.projects:`)',
+    '',
+    '> 동일 모노레포 / 인접 저장소에 존재하는 다른 프로젝트로 보입니다. ' +
+      '도메인이 겹친다면 `projects:` 블록에 추가 정의하는 것을 제안하세요.',
+    '',
+  ];
+  for (const s of siblings) {
+    const dirsStr =
+      s.topDirs.length > 0
+        ? ` · 발견된 디렉토리: ${s.topDirs.join(', ')}`
+        : '';
+    lines.push(`- **${s.path}/** — ${s.kind} (${s.signal})${dirsStr}`);
+  }
+  return lines.join('\n');
 }
 
 export function renderEvidence(evidence: ProjectEvidence[]): string {
@@ -242,12 +470,50 @@ export function renderEvidence(evidence: ProjectEvidence[]): string {
   return lines.join('\n').trimEnd();
 }
 
-export function buildBootstrapPrompt(evidence: ProjectEvidence[]): string {
+export function buildBootstrapPrompt(workspace: WorkspaceEvidence): string {
+  const { projects, siblings } = workspace;
+  const hasSiblings = siblings.length > 0;
+  const siblingBlock = hasSiblings ? `\n\n${renderSiblings(siblings)}\n` : '';
+
+  const projectsRule = hasSiblings
+    ? `6. **Untracked siblings** — Some adjacent projects (above) are not yet in \`lore.config.yaml.projects:\`. ` +
+      `If their evidence implies overlapping or complementary domains (e.g., a frontend that consumes the backend's data), ` +
+      `propose adding them as a new project entry (\`client\`, \`app\`, \`web\`, etc.) with reasonable include/exclude globs ` +
+      `derived from the "발견된 디렉토리" listing. Pick the language (\`python\` or \`typescript\`) from the sibling's kind.`
+    : '';
+
+  const fileOneExtras = hasSiblings
+    ? `
+
+If untracked siblings warrant new project entries, also include the
+\`projects:\` block addition INSIDE the same yaml fence — do not split
+into two yaml blocks. Example shape:
+
+\`\`\`yaml
+projects:
+  server:
+    # ... existing block, keep as-is unless it must change ...
+  client:                                    # ← new project entry
+    root: ../<sibling-relative-path>
+    language: typescript
+    include:
+      - "src/pages/**/*.{ts,tsx}"
+      - "src/stores/**/*.ts"
+      # ... derived from sibling's 발견된 디렉토리
+    exclude:
+      - "**/*.test.*"
+      - "**/node_modules/**"
+
+domains:
+  ...
+\`\`\``
+    : '';
+
   return `You are bootstrapping the Lore AI domain map for this workspace.
 
 # Evidence (auto-collected from lore.config.yaml include globs)
 
-${renderEvidence(evidence)}
+${renderEvidence(projects)}${siblingBlock}
 
 # Rules
 
@@ -255,11 +521,14 @@ ${renderEvidence(evidence)}
 2. Subdomains — must be words actually present in the evidence above. **No guessing, no invention.**
 3. Do NOT include placeholder domains like \`example\`, \`foo\`, \`bar\`.
 4. The yaml domain key set MUST exactly match the keys in DOMAIN_MAP.md (no missing, no extra).
-5. Use Korean labels (\`label:\`) and English keys.
+5. Use Korean labels (\`label:\`) and English keys.${projectsRule ? '\n' + projectsRule : ''}
 
-# Output — diff-only, two file blocks
+# Output — diff-only
 
-## File 1 — \`lore.config.yaml\` (replace the entire \`domains:\` block)
+## File 1 — \`lore.config.yaml\`
+
+Replace the existing \`domains:\` block (and \`projects:\` block if you are
+adding entries per Rule 6):
 
 \`\`\`yaml
 domains:
@@ -269,7 +538,7 @@ domains:
   <key2>:
     label: ...
     subdomains: [...]
-\`\`\`
+\`\`\`${fileOneExtras}
 
 ## File 2 — \`.lore/DOMAIN_MAP.md\` (replace the entire file)
 
@@ -289,16 +558,19 @@ domains:
 
 # Constraints
 
-- Output ONLY the two file blocks above. No commentary, no extra prose.
+- Output ONLY the file blocks above. No commentary, no extra prose.
 - yaml domain set == DOMAIN_MAP domain set (exact match, same order).
 - Korean labels, English keys, lowercase singular.
 `;
 }
 
-export function buildHeuristicDraft(evidence: ProjectEvidence[]): {
+export function buildHeuristicDraft(workspace: WorkspaceEvidence | ProjectEvidence[]): {
   yaml: string;
   domainMap: string;
+  projectsAddition?: string;
 } {
+  const evidence = Array.isArray(workspace) ? workspace : workspace.projects;
+  const siblings = Array.isArray(workspace) ? [] : workspace.siblings;
   const candidates = new Map<string, { label: string; subdomains: string[] }>();
 
   for (const proj of evidence) {
@@ -352,8 +624,56 @@ export function buildHeuristicDraft(evidence: ProjectEvidence[]): {
     mapLines.push('');
   }
 
+  // Optional projects: addition draft for untracked siblings
+  let projectsAddition: string | undefined;
+  if (siblings.length > 0) {
+    const addLines: string[] = [
+      '# 추가 후보 — `projects:` 블록에 다음 항목 추가 검토:',
+      '',
+    ];
+    for (const s of siblings) {
+      const language: 'python' | 'typescript' = s.kind === 'django' ? 'python' : 'typescript';
+      const includeGuess: string[] =
+        language === 'typescript'
+          ? s.topDirs
+              .filter((d) => !d.startsWith('apps'))
+              .slice(0, 6)
+              .map((d) => `      - "${d}/**/*.{ts,tsx}"`)
+          : [
+              '      - "**/views.py"',
+              '      - "**/views/**/*.py"',
+              '      - "**/models.py"',
+              '      - "**/models/**/*.py"',
+              '      - "**/services/**/*.py"',
+            ];
+
+      const slug = basename(s.path).replace(/^\.+/, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'sibling';
+      addLines.push(`  ${slug}:`);
+      addLines.push(`    root: ${s.path}`);
+      addLines.push(`    language: ${language}`);
+      addLines.push('    include:');
+      if (includeGuess.length === 0) {
+        addLines.push('      # TODO: 패턴 채우기');
+      } else {
+        addLines.push(...includeGuess);
+      }
+      addLines.push('    exclude:');
+      if (language === 'typescript') {
+        addLines.push('      - "**/*.test.*"');
+        addLines.push('      - "**/node_modules/**"');
+      } else {
+        addLines.push('      - "**/__init__.py"');
+        addLines.push('      - "**/migrations/**"');
+        addLines.push('      - "**/tests.py"');
+      }
+      addLines.push('');
+    }
+    projectsAddition = addLines.join('\n').trimEnd() + '\n';
+  }
+
   return {
     yaml: yamlLines.join('\n') + '\n',
     domainMap: mapLines.join('\n').trimEnd() + '\n',
+    projectsAddition,
   };
 }

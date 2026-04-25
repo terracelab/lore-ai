@@ -39,6 +39,20 @@ lore sync           ← .lore/flows/<카테고리>.md 생성
 - **Python (Django)**: 폴더 구조에서 앱을 추출. `<app>/models.py` · `<app>/models/*.py` · `<app>/views.py` · `<app>/views/**/*.py` · `<app>/services/**/*.py` 등 모두 인식. 각 파일에서 `class Foo` · `def bar` 정규식으로 심볼 이름 수집.
 - **TypeScript (Next/RN)**: `pages/`, `components/`, `stores/`, `hooks/`, `api/`, `schemas/`, `controllers/`, `router/`, `features/`, `screens/`, `modules/` 같은 1단 카테고리 폴더 추출 + 각 폴더의 즉시 자식 항목 (폴더명 또는 파일 basename).
 
+### 1-b. 모노레포 sibling 감지
+
+`projects.*.include` 에 들어있지 않더라도, **인접한 디렉토리 / 형제 저장소** 가 다른 종류의 프로젝트로 보이면 별도 evidence 섹션으로 surface 합니다.
+
+탐지 대상:
+- `cwd` 의 자식 디렉토리 (Turborepo/모노레포 루트에서 실행된 경우)
+- `cwd` 의 형제 디렉토리 (`../nuri-app` 처럼 분리된 저장소)
+
+분류 신호:
+- `package.json` 의 `dependencies.{expo, react-native, next, react}` → 각각 `expo` / `react-native` / `next` / `react`
+- `manage.py` → `django`
+
+각 sibling 의 `src/pages`, `src/stores`, `src/api` 같은 카테고리 디렉토리도 함께 surface → 프롬프트가 LLM 에게 "여기에 맞는 include 글롭으로 새 `projects:` 엔트리를 제안하라" 고 지시.
+
 ### 2. 프롬프트 빌드
 
 수집된 evidence + 빡빡한 규칙 + 출력 contract 를 한 프롬프트로 조립.
@@ -94,6 +108,24 @@ domains:
     label: job
     subdomains: [service, api]
   ...
+```
+
+sibling 이 감지되면 `projects:` 추가 후보도 함께 출력:
+
+```yaml
+# 추가 후보 — `projects:` 블록에 다음 항목 추가 검토:
+
+  nuri-app:
+    root: ../nuri-app
+    language: typescript
+    include:
+      - "src/pages/**/*.{ts,tsx}"
+      - "src/components/**/*.{ts,tsx}"
+      - "src/stores/**/*.{ts,tsx}"
+      - "src/api/**/*.{ts,tsx}"
+    exclude:
+      - "**/*.test.*"
+      - "**/node_modules/**"
 ```
 
 이후 사람이 한국어 라벨 / subdomain 정제 / 한 줄 설명만 채우면 됨.
