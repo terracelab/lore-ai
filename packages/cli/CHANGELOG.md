@@ -1,5 +1,17 @@
 # lore-ai
 
+## 0.3.1
+
+### Patch Changes
+
+- [#11](https://github.com/terracelab/lore-ai/pull/11) [`4d0057f`](https://github.com/terracelab/lore-ai/commit/4d0057fd59aea490d5c7ce90f74b7ffe35c63d33) Thanks [@kyong-dev](https://github.com/kyong-dev)! - `lore init` 이 생성하는 `.lore/COMMANDS.md` 치트시트에 클립보드 복사 예시 추가. `lore bootstrap | pbcopy`, `lore synthesize | pbcopy` 같은 단축 흐름과 macOS / Linux (X11 · Wayland) / WSL / Windows / 크로스플랫폼별 명령 표를 포함.
+
+- [#13](https://github.com/terracelab/lore-ai/pull/13) [`fd14be5`](https://github.com/terracelab/lore-ai/commit/fd14be5a6364772efdb56c6496f3cb60e26518e9) Thanks [@kyong-dev](https://github.com/kyong-dev)! - 문서 도메인을 `docs.lore-ai.vercel.app` 에서 `lore-ai-docs.vercel.app` 으로 변경. `lore init` 이 생성하는 `.lore/COMMANDS.md` 안내, README, AI 에디터 가드레일 템플릿 (`templates/ai/CLAUDE.md`, `copilot-instructions.md`) 의 모든 docs 링크가 새 도메인을 가리키도록 갱신.
+
+- Updated dependencies []:
+  - @lore-ai-automation/core@0.3.1
+  - @lore-ai-automation/parser@0.3.1
+
 ## 0.3.0
 
 ### Minor Changes
