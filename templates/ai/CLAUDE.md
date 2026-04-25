@@ -123,6 +123,6 @@ export async function refreshPushToken() { ... }
 
 ## 참고
 
-- 전체 스펙: <https://docs.lore-ai.vercel.app/concepts/annotations>
-- 데이터 아카이올로지 (`@History` 깊이): <https://docs.lore-ai.vercel.app/concepts/data-archaeology>
-- 가드레일 셋업 (Hook): <https://docs.lore-ai.vercel.app/guides/ai-harness>
+- 전체 스펙: <https://lore-ai-docs.vercel.app/concepts/annotations>
+- 데이터 아카이올로지 (`@History` 깊이): <https://lore-ai-docs.vercel.app/concepts/data-archaeology>
+- 가드레일 셋업 (Hook): <https://lore-ai-docs.vercel.app/guides/ai-harness>

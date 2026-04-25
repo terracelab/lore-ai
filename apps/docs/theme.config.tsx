@@ -43,7 +43,7 @@ const config: DocsThemeConfig = {
         property="og:description"
         content="Living business-logic documentation for AI-assisted dev teams."
       />
-      <meta property="og:url" content="https://docs.lore-ai.vercel.app" />
+      <meta property="og:url" content="https://lore-ai-docs.vercel.app" />
       <meta property="og:type" content="website" />
     </>
   ),

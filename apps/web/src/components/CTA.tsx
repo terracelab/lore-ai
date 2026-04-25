@@ -11,7 +11,7 @@ export function CTA() {
         </div>
         <div className="mt-6 flex justify-center gap-3">
           <a
-            href="https://docs.lore-ai.vercel.app"
+            href="https://lore-ai-docs.vercel.app"
             className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
           >
             전체 문서 →

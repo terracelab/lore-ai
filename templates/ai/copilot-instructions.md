@@ -56,5 +56,5 @@ export default function ProfileCard({ userInfo }: Props) { ... }
 
 ## 자세한 스펙
 
-전체 규칙: <https://docs.lore-ai.vercel.app/concepts/annotations>
-강한 가드레일 (Claude Code hooks): <https://docs.lore-ai.vercel.app/guides/ai-harness>
+전체 규칙: <https://lore-ai-docs.vercel.app/concepts/annotations>
+강한 가드레일 (Claude Code hooks): <https://lore-ai-docs.vercel.app/guides/ai-harness>

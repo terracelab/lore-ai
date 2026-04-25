@@ -6,7 +6,7 @@
 
 코드 옆에 도메인 지식을 적어두면, AI 가 읽는다.
 
-[Website](https://lore-ai.vercel.app) · [Documentation](https://docs.lore-ai.vercel.app) · [npm](https://www.npmjs.com/package/lore-ai) · [Discussions](https://github.com/terracelab/lore-ai/discussions)
+[Website](https://lore-ai.vercel.app) · [Documentation](https://lore-ai-docs.vercel.app) · [npm](https://www.npmjs.com/package/lore-ai) · [Discussions](https://github.com/terracelab/lore-ai/discussions)
 
 [![npm version](https://img.shields.io/npm/v/lore-ai.svg)](https://www.npmjs.com/package/lore-ai)
 [![CI](https://github.com/terracelab/lore-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/terracelab/lore-ai/actions/workflows/ci.yml)
@@ -43,7 +43,7 @@ lore init
 lore sync
 ```
 
-자세한 내용은 **[Getting Started](https://docs.lore-ai.vercel.app/getting-started/quickstart)** 를 참고하세요.
+자세한 내용은 **[Getting Started](https://lore-ai-docs.vercel.app/getting-started/quickstart)** 를 참고하세요.
 
 ## 설치
 
@@ -68,7 +68,7 @@ Node.js 18.18+ 필요.
 | `lore publish`          | Lore Board 에 문서 동기화                |
 | `lore chat`             | 로컬 RAG Q&A                             |
 
-전체 레퍼런스는 **[CLI Docs](https://docs.lore-ai.vercel.app/cli/init)** 참고.
+전체 레퍼런스는 **[CLI Docs](https://lore-ai-docs.vercel.app/cli/init)** 참고.
 
 ## 어노테이션 예시
 
@@ -95,7 +95,7 @@ class Subscription(models.Model):
 export default function ProfileCard({ userInfo }: Props) { ... }
 ```
 
-[Annotation Spec →](https://docs.lore-ai.vercel.app/concepts/annotations)
+[Annotation Spec →](https://lore-ai-docs.vercel.app/concepts/annotations)
 
 ## 모노레포 구조
 

@@ -74,7 +74,7 @@ GitHub Token 은 자동 (`secrets.GITHUB_TOKEN`).
 2. **Project Name**: `lore-ai-docs`
 3. **Root Directory**: `apps/docs`
 4. **Build Command**: `cd ../.. && pnpm install --frozen-lockfile && pnpm --filter docs build`
-5. 도메인: `docs.lore-ai.vercel.app` alias
+5. 도메인: `lore-ai-docs.vercel.app` alias
 
 ### 2.3 (선택) 커스텀 도메인
 

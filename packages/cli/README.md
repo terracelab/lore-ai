@@ -20,7 +20,7 @@ lore check $(git ls-files '*.py' '*.tsx')
 lore sync               # generates .lore/flows/<category>.md
 ```
 
-See full docs at <https://docs.lore-ai.vercel.app>.
+See full docs at <https://lore-ai-docs.vercel.app>.
 
 ## Commands
 
