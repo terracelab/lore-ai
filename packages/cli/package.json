@@ -1,6 +1,6 @@
 {
   "name": "lore-ai",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CLI for Lore AI — living business-logic documentation for AI-assisted dev teams.",
   "license": "MIT",
   "author": "Terracelab <oss@terracelab.co.kr>",
