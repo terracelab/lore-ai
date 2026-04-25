@@ -1,0 +1,67 @@
+{
+  "name": "@lore-ai/core",
+  "version": "0.0.0",
+  "description": "Core engine for Lore AI: annotation parser, config loader, markdown synthesizer, checker.",
+  "license": "MIT",
+  "author": "Terracelab <oss@terracelab.co.kr>",
+  "homepage": "https://lore-ai.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terracelab/lore-ai.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/terracelab/lore-ai/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./parser": {
+      "types": "./dist/parser.d.ts",
+      "import": "./dist/parser.js"
+    },
+    "./checker": {
+      "types": "./dist/checker.d.ts",
+      "import": "./dist/checker.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "import": "./dist/markdown.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  },
+  "keywords": ["lore-ai", "documentation", "ai", "parser", "annotations"]
+}

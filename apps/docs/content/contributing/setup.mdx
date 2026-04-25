@@ -1,0 +1,47 @@
+---
+title: 개발 환경
+---
+
+# 개발 환경
+
+## 준비물
+
+- Node.js 18.18+ (권장 20)
+- pnpm 9+
+- Git
+
+## 클론 & 빌드
+
+```bash
+git clone https://github.com/terracelab/lore-ai.git
+cd lore-ai
+pnpm install
+pnpm build       # turbo 가 모든 패키지 빌드
+pnpm test        # vitest
+```
+
+## 사이트 미리보기
+
+```bash
+pnpm --filter web dev   # → localhost:3000 (랜딩)
+pnpm --filter docs dev  # → localhost:3001 (도큐)
+```
+
+## CLI 로컬 실행
+
+```bash
+pnpm --filter lore-ai build
+node packages/cli/dist/cli.js init
+# 또는 npm link 로 심볼릭 링크
+cd packages/cli && npm link && cd -
+lore --version
+```
+
+## 디렉토리 가이드
+
+- `packages/core/src/` — 파서·체커·마크다운
+- `packages/cli/src/commands/` — 각 커맨드 핸들러
+- `apps/web/src/components/` — 랜딩 컴포넌트
+- `apps/docs/content/` — 본 도큐 (MDX)
+
+자세한 가이드는 [CONTRIBUTING.md](https://github.com/terracelab/lore-ai/blob/main/CONTRIBUTING.md).

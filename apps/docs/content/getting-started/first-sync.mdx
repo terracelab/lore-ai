@@ -1,0 +1,62 @@
+---
+title: 첫 sync 결과 읽기
+description: lore sync 가 만든 .lore/flows 디렉토리 구조와 frontmatter 의미.
+---
+
+# 첫 sync 결과 읽기
+
+```text
+.lore/
+├── DOMAIN_MAP.md
+└── flows/
+    ├── INDEX.md         ← 자동 생성, 사이드바 노출 X
+    ├── auth.md          ← 카테고리 1 = 파일 1
+    ├── subscription.md
+    └── signal.md
+```
+
+## 카테고리 파일 frontmatter
+
+```yaml
+---
+slug: signal
+title: 시그널
+icon: 📘
+order: 2
+summary: 시그널 톡·픽·리포트·투표
+tags: [talk, realtime, pick]
+last_reviewed: 2026-04-25
+source_files: 23
+---
+```
+
+| 필드 | 필수 | 의미 |
+|------|------|-----|
+| `slug` | ✅ | 파일명·라우트 키 |
+| `title` | ✅ | 사이드바 표시명 |
+| `icon` | ✅ | 이모지 1개 |
+| `order` | ✅ | 정렬 |
+| `summary` | — | 카드 서브타이틀 |
+| `tags` | — | 검색·필터 |
+| `last_reviewed` | — | sync 일자 |
+| `source_files` | — | 추출 소스 수 |
+
+자세한 contract 는 [reference/frontmatter](/reference/frontmatter) 참고.
+
+## 본문 규칙
+
+`# H1` 한 번 → `## H2` 여러 번. **H2 단위로 RAG 인덱싱**되므로 H2 제목은 검색 키워드에 걸릴 만한 말로.
+
+```mdx
+# 📘 시그널
+
+## 1. 시그널의 종류
+구독자에게 노출되는 4가지 종류 …
+
+## 2. 발행 파이프라인
+DetectionWorker → SignalEvent → …
+```
+
+## 멱등성
+
+같은 git HEAD 에서 두 번 `lore sync` 해도 결과가 동일합니다. 의미 있는 코드 변경 없이 sync 만 반복해도 git diff 가 0 입니다.

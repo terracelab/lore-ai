@@ -1,0 +1,40 @@
+version: 1
+
+projects:
+  app:
+    root: ./
+    language: typescript
+    include:
+      - "app/**/*.{ts,tsx}"
+      - "src/**/*.{ts,tsx}"
+      - "lib/**/*.ts"
+      - "hooks/**/*.ts"
+    exclude:
+      - "**/*.test.*"
+      - "**/*.spec.*"
+      - "**/node_modules/**"
+      - ".next/**"
+
+domains:
+  auth:
+    label: 인증
+    subdomains: [session, oauth]
+  ui:
+    label: UI/페이지
+    subdomains: [page, layout, component]
+
+flows:
+  dir: ./.lore/flows
+  indexFile: INDEX.md
+
+extract:
+  requireDomain: true
+  requireBusinessLogic: true
+  requireHistoryOnDataChange: warn
+  minSubstantiveLines: 5
+
+llm:
+  provider: anthropic
+  model: claude-opus-4-7
+  apiKeyEnv: ANTHROPIC_API_KEY
+  temperature: 0.3

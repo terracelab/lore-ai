@@ -1,0 +1,25 @@
+---
+title: MCP Server (v1)
+---
+
+# MCP Server
+
+> **상태**: v1 예정. 본 문서는 설계 미리보기입니다.
+
+[Model Context Protocol](https://modelcontextprotocol.io) 호환 서버를 통해 AI 에이전트가 Lore AI 데이터를 stdio / HTTP 로 조회할 수 있게 됩니다.
+
+## 리소스
+
+| URI | 내용 |
+|-----|------|
+| `lore://domain-map` | L1 도메인 지도 마크다운 |
+| `lore://flows/<cat>` | L2 카테고리 마크다운 |
+| `lore://business-logic/<project>` | 프로젝트별 L3 합본 |
+
+## 도구
+
+- `search_flows(query)` — 자연어 RAG 검색 → `[ {slug, h2, snippet} ]`
+- `get_history(symbol)` — 특정 심볼의 `@History` 타임라인
+- `validate_change(diff)` — patch 가 어떤 도메인을 건드리는지, `@History` 가 필요한지 평가
+
+자세한 스펙은 [LORE_AI_PACKAGING.md §5.7](https://github.com/terracelab/lore-ai/blob/main/LORE_AI_PACKAGING.md) 참고.

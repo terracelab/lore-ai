@@ -1,0 +1,45 @@
+---
+title: 설치
+description: lore-ai CLI 를 설치하는 세 가지 방법.
+---
+
+# 설치
+
+## 요구 사항
+
+- Node.js **18.18+** (권장 20.x)
+- pnpm 9+ 또는 npm 10+
+- 운영체제: macOS · Linux · Windows (WSL 권장)
+
+## 1. 전역 설치 (권장)
+
+```bash
+npm i -g lore-ai
+```
+
+설치 확인:
+
+```bash
+lore --version
+```
+
+## 2. 프로젝트 dev dependency
+
+각 레포가 자체 버전을 핀하고 싶을 때:
+
+```bash
+pnpm add -D lore-ai
+# 사용:
+pnpm exec lore init
+```
+
+## 3. 일회성 실행 (`npx`)
+
+```bash
+npx lore-ai init
+```
+
+## 다음
+
+- [Quickstart](/getting-started/quickstart) 로 첫 sync 까지 5분.
+- 회사 위키와 연결하려면 [Lore Board 가이드](/concepts/lore-board) 도 함께.

@@ -1,0 +1,37 @@
+---
+title: Lore AI 소개
+description: 코드 옆 비즈니스 로직 주석을 추출해 AI 가 도메인 맥락을 이해하게 만드는 CLI + 패키지.
+---
+
+# Lore AI
+
+> **Living business-logic documentation for AI-assisted dev teams.**
+
+Lore AI 는 코드 옆에 적어두는 도메인 지식 (`@Domain`, `@BusinessLogic`, `@History`) 을
+구조화된 마크다운으로 추출해 **Claude Code · Copilot · Cursor** 가 *왜 이렇게 짰는지* 까지
+함께 읽도록 돕는 도구입니다.
+
+```bash
+npm i -g lore-ai
+cd my-project
+lore init
+lore sync
+```
+
+## 무엇이 다른가
+
+- **3-Layer 구조** — L1 도메인 지도 / L2 카테고리 서사 / L3 심볼별 팩트
+- **데이터 아카이올로지** — `@History` 로 과거 DB 의미를 보존
+- **AI-first 출력 규격** — H2 단위 RAG 인덱싱, frontmatter contract 고정
+- **무료 OSS** — MIT, npm 공개, Vercel 무료 호스팅
+
+## 다음 단계
+
+- [Quickstart](/getting-started/quickstart) — 5분 안에 첫 sync
+- [Annotation Spec](/concepts/annotations) — 태그 종류와 작성 규칙
+- [CLI Reference](/cli/init) — 커맨드 전체 목록
+- [Integrations](/integrations/claude-code) — Claude Code · Copilot · Cursor
+
+## 라이선스
+
+[MIT](https://github.com/terracelab/lore-ai/blob/main/LICENSE) © 2026 Terracelab

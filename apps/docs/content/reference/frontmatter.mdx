@@ -1,0 +1,32 @@
+---
+title: L2 Frontmatter Contract
+---
+
+# L2 Frontmatter Contract
+
+Lore Board 의 [`FlowMeta`](https://github.com/terracelab/lore-board/blob/main/src/lib/content.ts) 와 1:1 매핑됩니다. 추가 필드는 파서가 무시합니다.
+
+```yaml
+---
+slug: signal                       # 필수 · 파일명과 동일
+title: 시그널                      # 필수 · 한글 표시명
+icon: 📘                           # 필수 · 이모지 1개
+order: 2                           # 필수 · 사이드바 정렬
+summary: 시그널 톡·픽·리포트·투표
+tags: [talk, realtime, pick]
+last_reviewed: 2026-04-25
+source_commit: abc1234
+source_files: 23
+---
+```
+
+## 본문 규칙
+
+- `# H1` 1회 → `## H2` 다수
+- H2 단위로 RAG 인덱싱됨
+- H2 본문 ≥ 20 자 (너무 짧으면 인덱싱 skip)
+- H3 이하는 본문 검색에만 포함
+
+## INDEX.md
+
+자동 생성. `slug: index` 로 마킹되어 Lore Board 의 `getAllFlows()` 가 사이드바에 노출하지 않습니다.

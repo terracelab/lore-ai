@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 질문 / 토론
+    url: https://github.com/terracelab/lore-ai/discussions
+    about: 사용법 질문, 아이디어, Show-and-tell 은 Discussions 로
+  - name: 🔒 보안 취약점
+    url: https://github.com/terracelab/lore-ai/security/advisories/new
+    about: 보안 이슈는 비공개 advisory 로 보고해주세요

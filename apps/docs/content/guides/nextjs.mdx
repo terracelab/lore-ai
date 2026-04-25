@@ -1,0 +1,54 @@
+---
+title: Next.js 프로젝트에 Lore AI 도입
+---
+
+# Next.js
+
+```bash
+pnpm add -D lore-ai
+pnpm exec lore init --template nextjs
+```
+
+## include 패턴
+
+```yaml
+projects:
+  app:
+    root: ./
+    language: typescript
+    include:
+      - "app/**/*.{ts,tsx}"
+      - "src/**/*.{ts,tsx}"
+      - "lib/**/*.ts"
+      - "hooks/**/*.ts"
+    exclude:
+      - "**/*.test.*"
+      - ".next/**"
+      - "node_modules/**"
+```
+
+## Server Actions / Route Handlers
+
+대표 핸들러에 주석을 다는 것이 가장 효과적입니다:
+
+```ts
+/**
+ * @Domain checkout/order
+ * @BusinessLogic 결제 승인 후 재고 감산 + 영수증 이메일 발송
+ */
+export async function POST(req: Request) {
+  // ...
+}
+```
+
+## Vercel / Turborepo
+
+Lore AI 자체는 Next.js 빌드와 분리됩니다. CI 에서:
+
+```yaml
+- run: pnpm install --frozen-lockfile
+- run: pnpm exec lore sync
+- run: git diff --exit-code .lore/
+```
+
+drift check 만 통과하면 됩니다.

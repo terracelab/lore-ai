@@ -1,0 +1,76 @@
+---
+title: 어노테이션 스펙
+description: @Domain · @BusinessLogic · @History 등 7개 태그의 의미·필수 여부·작성 규칙.
+---
+
+# 어노테이션 스펙
+
+## 태그 등급
+
+| 태그 | 등급 | 용도 |
+|------|------|-----|
+| `@Domain` | **필수** | L1 카테고리 토큰. config 검증 대상 |
+| `@BusinessLogic` | **필수** | 한 줄 로직 요약 |
+| `@History` | **조건부 필수** | 데이터/정책 의미 변경 시 |
+| `@Context` | 선택 | 의사결정 배경 |
+| `@Flow` | 선택 | L2 flow-id 링크 |
+| `@MigratedFrom` | 선택 | V1→V2 마이그레이션 추적 |
+| `@SeeAlso` | 선택 | 관련 심볼 참조 |
+
+## `@Domain`
+
+- 형식: `<token>` 또는 `<token>/<subtoken>`
+- 다중: 쉼표로 (`subscription/master, notification/trigger`)
+- `lore.config.yaml` 의 `domains:` 에 등록된 토큰만 허용
+- 검증: `lore check` 가 알 수 없는 토큰을 거부
+
+## `@BusinessLogic`
+
+- 한 줄 요약 (60자 권장)
+- 시스템 동작이 아닌 **비즈니스 의도**를 적을 것
+- ❌ "subscription 모델 정의"
+- ✅ "valid_until 지나면 is_active=False, Celery 자동 갱신"
+
+## `@History`
+
+데이터·정책 의미가 바뀌는 변경에만 추가합니다. 자세한 내용은 [데이터 아카이올로지](/concepts/data-archaeology).
+
+```python
+@History:
+  - 2024-03-15: trial 7일 → 14일
+  - 2024-11-02: valid_until NOT NULL 강제
+```
+
+## 형식
+
+### Python (docstring)
+
+```python
+class Subscription(models.Model):
+    """
+    @Domain: subscription/master
+    @BusinessLogic: valid_until 지나면 is_active=False
+    @Context: 자동 결제 실패 시 3일 grace 제공
+    @History:
+      - 2024-03-15: trial 7일 → 14일
+    @Flow: auto-renewal, grace-period
+    """
+```
+
+### TypeScript (JSDoc)
+
+```tsx
+/**
+ * @Domain auth/profile
+ * @BusinessLogic 구독 등급 + trial 남은일수 표기
+ * @Flow profile-display
+ */
+export default function ProfileCard({ userInfo }: Props) { ... }
+```
+
+## 검증 규칙
+
+- `requireDomain: true` (기본) → `@Domain` 누락 시 fail
+- `requireBusinessLogic: true` (기본) → `@BusinessLogic` 누락 시 fail
+- `requireHistoryOnDataChange: warn|strict|off` → `@History` 권장도 (heuristic)
+- `minSubstantiveLines: 5` → 5줄 이하 boilerplate 파일은 검사 skip

@@ -1,0 +1,61 @@
+{
+  "name": "lore-ai",
+  "version": "0.0.0",
+  "description": "CLI for Lore AI — living business-logic documentation for AI-assisted dev teams.",
+  "license": "MIT",
+  "author": "Terracelab <oss@terracelab.co.kr>",
+  "homepage": "https://lore-ai.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terracelab/lore-ai.git",
+    "directory": "packages/cli"
+  },
+  "bugs": "https://github.com/terracelab/lore-ai/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "lore": "./dist/cli.js"
+  },
+  "files": ["dist", "templates", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@lore-ai/core": "workspace:*",
+    "@lore-ai/parser": "workspace:*",
+    "commander": "^12.1.0",
+    "fast-glob": "^3.3.2",
+    "kleur": "^4.1.5",
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "tsup": "^8.3.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  },
+  "keywords": [
+    "lore-ai",
+    "cli",
+    "documentation",
+    "ai",
+    "claude-code",
+    "copilot",
+    "annotations"
+  ]
+}

@@ -1,0 +1,43 @@
+---
+title: 릴리즈 프로세스
+---
+
+# 릴리즈 프로세스
+
+> 메인테이너 전용. 일반 기여자는 [CONTRIBUTING.md](https://github.com/terracelab/lore-ai/blob/main/CONTRIBUTING.md) 와 `pnpm changeset` 만 알면 됩니다.
+
+## 흐름
+
+```text
+PR ──┐
+PR ──┤  → main merge → changesets bot opens "Version Packages" PR
+PR ──┘                        │
+                             merge that PR
+                              │
+                              ▼
+                   release.yml runs:
+                     pnpm publish -r --access public
+                     git tag + GitHub Release
+```
+
+## 첫 릴리즈
+
+1. npm 이름 선점 확인:
+   ```bash
+   npm view lore-ai
+   npm view @lore-ai/core
+   npm view @lore-ai/parser
+   ```
+2. `NPM_TOKEN` (automation token) 을 GitHub Secrets 에 등록
+3. `0.1.0-alpha.0` 까지 changeset 누적 → `pnpm changeset version` 으로 처음만 수동 실행
+4. main 머지 → `release.yml` 이 첫 publish
+
+## 일상 릴리즈
+
+기여자가 PR 마다 `pnpm changeset` 으로 `.changeset/<id>.md` 추가 → main 머지 → 봇이 "Version Packages" PR 자동 생성 → 메인테이너가 머지 → npm publish.
+
+수동 개입은 첫 릴리즈와 sec-fix hotfix 외엔 없습니다.
+
+## 자세히
+
+루트의 [RELEASING.md](https://github.com/terracelab/lore-ai/blob/main/RELEASING.md) 참조.

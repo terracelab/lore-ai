@@ -1,0 +1,56 @@
+{
+  "name": "@lore-ai/parser",
+  "version": "0.0.0",
+  "description": "Tree-sitter wrappers for Lore AI: substantive-file detection for Python and TypeScript.",
+  "license": "MIT",
+  "author": "Terracelab <oss@terracelab.co.kr>",
+  "homepage": "https://lore-ai.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terracelab/lore-ai.git",
+    "directory": "packages/parser"
+  },
+  "bugs": "https://github.com/terracelab/lore-ai/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./python": {
+      "types": "./dist/python.d.ts",
+      "import": "./dist/python.js"
+    },
+    "./typescript": {
+      "types": "./dist/typescript.d.ts",
+      "import": "./dist/typescript.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@lore-ai/core": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  }
+}

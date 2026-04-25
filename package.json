@@ -1,0 +1,46 @@
+{
+  "name": "lore-ai-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Living business-logic documentation for AI-assisted dev teams",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terracelab/lore-ai.git"
+  },
+  "homepage": "https://lore-ai.vercel.app",
+  "bugs": "https://github.com/terracelab/lore-ai/issues",
+  "license": "MIT",
+  "author": "Terracelab <oss@terracelab.co.kr>",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=18.18.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,mdx,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,mdx,yaml,yml}\"",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "@types/node": "^20.14.10",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3",
+    "typescript": "^5.5.4"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100,
+    "arrowParens": "always"
+  }
+}

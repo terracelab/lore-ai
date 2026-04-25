@@ -1,0 +1,77 @@
+name: 🐛 Bug Report
+description: 재현 가능한 버그를 리포트합니다
+title: 'bug: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        버그 리포트를 작성해 주셔서 감사합니다. 빠른 처리를 위해 **재현 최소 예제**를 꼭 포함해 주세요.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 무슨 일이 일어났나요?
+      description: 어떤 동작을 기대했고, 실제로는 어떻게 됐나요?
+      placeholder: |
+        기대: lore sync 가 .lore/flows/auth.md 를 생성해야 한다.
+        실제: 빈 파일만 생성됨.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 재현 단계
+      description: 가능하면 최소 예제 레포지토리 링크를 포함해 주세요.
+      placeholder: |
+        1. `lore init`
+        2. views.py 에 @Domain 주석 추가
+        3. `lore sync` 실행
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: lore-ai 버전
+      placeholder: '0.1.0'
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node.js 버전
+      placeholder: 'v20.10.0'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 로그 / 에러
+      description: '`--verbose` 플래그를 사용했다면 함께 첨부해 주세요.'
+      render: shell
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 확인
+      options:
+        - label: 행동 강령을 읽었습니다
+          required: true
+        - label: 동일/유사 이슈가 없는지 검색했습니다
+          required: true

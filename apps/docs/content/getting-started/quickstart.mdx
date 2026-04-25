@@ -1,0 +1,95 @@
+---
+title: 5분 Quickstart
+description: lore init → 주석 → check → sync 까지 첫 사이클을 끝내는 가장 짧은 경로.
+---
+
+import { Callout, Steps, Tabs } from 'nextra/components';
+
+# 5분 Quickstart
+
+이 가이드는 `lore init` 부터 첫 `.lore/flows/<카테고리>.md` 가 생성되는 시점까지를 다룹니다. 평균 60~90초.
+
+<Steps>
+
+### CLI 설치
+
+```bash
+npm i -g lore-ai
+```
+
+### 프로젝트 초기화
+
+```bash
+cd my-project
+lore init
+```
+
+생성되는 것:
+
+- `lore.config.yaml` — 프로젝트·도메인 정의
+- `.lore/flows/` — L2 카테고리 마크다운이 들어갈 자리
+- `.lore/DOMAIN_MAP.md` — L1 도메인 지도
+
+### 도메인 등록
+
+`lore.config.yaml` 의 `domains:` 에 카테고리 토큰을 추가합니다.
+
+```yaml
+domains:
+  auth:
+    label: 인증
+    subdomains: [profile, session]
+  subscription:
+    label: 구독
+    subdomains: [master, renewal, trial]
+```
+
+### 코드에 주석 작성
+
+<Tabs items={['Python (Django)', 'TypeScript (React/RN)']}>
+<Tabs.Tab>
+```python
+class Subscription(models.Model):
+    """
+    @Domain: subscription/master
+    @BusinessLogic: valid_until 지나면 is_active=False
+    @History:
+      - 2024-03-15: trial 7일 → 14일
+    """
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```tsx
+/**
+ * @Domain auth/profile
+ * @BusinessLogic 구독 등급 + trial 남은일수 표기
+ */
+export default function ProfileCard({ userInfo }: Props) { ... }
+```
+</Tabs.Tab>
+</Tabs>
+
+### 검증
+
+```bash
+lore check $(git ls-files '*.py' '*.ts' '*.tsx')
+```
+
+<Callout type="info">
+  precommit 훅은 [hooks 가이드](/integrations/cursor#precommit) 참조.
+</Callout>
+
+### Sync
+
+```bash
+lore sync
+```
+
+`.lore/flows/auth.md`, `subscription.md`, `INDEX.md` 가 생성됩니다.
+
+</Steps>
+
+## 다음
+
+- 결과 마크다운 읽는 법 → [첫 sync 결과 읽기](/getting-started/first-sync)
+- AI 에디터에 연결 → [Claude Code 통합](/integrations/claude-code)

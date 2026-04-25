@@ -1,0 +1,41 @@
+---
+title: lore check
+---
+
+# `lore check`
+
+스테이징된 (또는 명시한) 파일에서 어노테이션을 검증합니다. precommit 훅의 엔트리.
+
+```bash
+lore check [files...] [--json] [--no-color]
+```
+
+## 옵션
+
+| 플래그 | 설명 |
+|--------|------|
+| `--json` | 머신 가독 출력 |
+| `--no-color` | 색상 비활성화 |
+
+## 종료 코드
+
+- `0` — 모두 통과
+- `1` — 한 건 이상 error 존재
+
+## 위반 규칙
+
+| 규칙 | 등급 | 의미 |
+|------|------|------|
+| `require-domain` | error | `@Domain` 누락 |
+| `require-business-logic` | error | `@BusinessLogic` 누락 |
+| `unknown-domain` | error | 등록되지 않은 토큰 사용 |
+| `history-on-data-change` | warn | 데이터 의미 변경 감지 시 |
+
+## precommit 통합
+
+[hooks 가이드](/integrations/cursor#precommit) 참고. 권장 husky 설정:
+
+```bash
+npx husky add .husky/pre-commit \
+  "npx lore-ai check \$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(py|ts|tsx)$')"
+```

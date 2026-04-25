@@ -1,0 +1,51 @@
+---
+title: 기존 문서를 Lore AI 로 이주
+---
+
+# 기존 문서를 Lore AI 로 이주
+
+기존 README · Notion · Confluence 페이지를 한 번에 옮기지 마세요. **카테고리 단위로 점진적**으로 이주하는 것이 비용이 가장 낮습니다.
+
+## 1. 도메인 한두 개로 시작
+
+가장 활발히 변경되는 영역 하나를 골라 (`auth`, `payment` 같은) `domains:` 에 등록 → 핵심 모델·서비스에 `@Domain` 만 먼저 붙입니다.
+
+## 2. `lore sync` 로 실측
+
+`@BusinessLogic` 이 빈 채로도 sync 가 돌아갑니다. 출력된 `.lore/flows/<카테고리>.md` 의 "심볼 목록" 이 곧 카테고리 범위입니다.
+
+## 3. 한 줄 요약 채우기
+
+기존 문서를 보며 `@BusinessLogic` 한 줄을 채워 넣습니다. **요약은 Notion 의 한 단락이 아닙니다** — 60자 안에 의도가 들어가야 합니다.
+
+## 4. `@History` 는 데이터 변경 시점만
+
+지나간 모든 변경을 기록할 필요는 없습니다. **DB row 의 의미가 달라지는 시점**만:
+
+- ENUM 값 추가/제거
+- NULL 정책 변경
+- 임계값 변경 (백필 없음 시 특히)
+
+## 5. 이주 우선순위
+
+```
+높음 ─ models / schemas / migrations
+       ↓
+       services / use-cases
+       ↓
+       views / handlers / route handlers
+       ↓
+낮음 ─ utils / view-only components
+```
+
+## 6. Notion 에서 발췌
+
+기존 Notion 의 "왜 이렇게 짰나" 절은 → `@Context` 로 옮깁니다.
+
+```python
+@Context: trial 종료 후 자동 결제 실패 시 3일 grace 제공 (CS 요청 #1203)
+```
+
+## 7. 첫 번째 카테고리 완성 후
+
+[Lore Board](/concepts/lore-board) 에 publish 해서 팀이 실제로 읽도록 합니다. 이 시점부터는 다음 카테고리 이주가 훨씬 쉬워집니다 — "왜 우리가 이걸 하는지" 가 곧 모범이 됩니다.

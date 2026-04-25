@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# test
+coverage/
+*.log
+.vitest-cache/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# system
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# lore output (inside test fixtures only)
+.lore/
+
+# vercel
+.vercel/
+
+# pagefind
+pagefind/

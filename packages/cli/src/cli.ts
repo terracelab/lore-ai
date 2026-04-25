@@ -1,0 +1,68 @@
+import { Command } from 'commander';
+import { initCommand } from './commands/init.js';
+import { checkCommand } from './commands/check.js';
+import { syncCommand } from './commands/sync.js';
+import { synthesizeCommand } from './commands/synthesize.js';
+import { publishCommand } from './commands/publish.js';
+import { chatCommand } from './commands/chat.js';
+import { VERSION } from './index.js';
+
+export function buildProgram(): Command {
+  const program = new Command();
+
+  program
+    .name('lore')
+    .description('Lore AI — living business-logic documentation for AI-assisted dev teams')
+    .version(VERSION)
+    .showHelpAfterError();
+
+  program
+    .command('init')
+    .description('Initialize lore.config.yaml + flows scaffold in the current workspace')
+    .option('--template <name>', 'starter template (django-expo | nextjs | custom)', 'custom')
+    .option('-y, --yes', 'accept all defaults')
+    .action(initCommand);
+
+  program
+    .command('check [files...]')
+    .description('Validate annotations on the given files (precommit entrypoint)')
+    .option('--json', 'emit machine-readable output')
+    .option('--no-color', 'disable color output')
+    .action(checkCommand);
+
+  program
+    .command('sync')
+    .description('Scan the workspace and regenerate .lore/flows/*.md (L2 + L3)')
+    .option('--project <name>', 'limit to a single project key from lore.config.yaml')
+    .option('--dry-run', 'print planned writes without touching disk')
+    .action(syncCommand);
+
+  program
+    .command('synthesize <category>')
+    .description('Build an LLM prompt (or call the API) to refresh a single L2 flow')
+    .option('--apply', 'call the LLM API directly and overwrite the flow file')
+    .option('--since <range>', 'limit to commits in this range (e.g. 2.weeks)')
+    .action(synthesizeCommand);
+
+  program
+    .command('publish')
+    .description('Push generated .lore/flows to a Lore Board target (path or git URL)')
+    .option('--target <path>', 'override publish.target from config')
+    .option('--mode <mode>', 'direct | pr', 'direct')
+    .option('--branch <name>', 'branch to push to', 'main')
+    .option('--dry-run', 'print plan without writing or pushing')
+    .action(publishCommand);
+
+  program
+    .command('chat')
+    .description('Local RAG REPL over L1 + L2 + L3 (Anthropic / OpenAI key required)')
+    .option('--provider <name>', 'anthropic | openai')
+    .action(chatCommand);
+
+  return program;
+}
+
+export async function run(argv: string[] = process.argv): Promise<void> {
+  const program = buildProgram();
+  await program.parseAsync(argv);
+}

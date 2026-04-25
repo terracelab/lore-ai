@@ -1,0 +1,37 @@
+---
+title: lore synthesize
+---
+
+# `lore synthesize <category>`
+
+LLM 으로 단일 L2 flow 파일을 재구성하기 위한 **프롬프트를 빌드** 합니다.
+
+```bash
+lore synthesize signal           # 프롬프트를 stdout 으로 출력
+lore synthesize signal --apply   # (v0.2) Anthropic API 호출 + 파일 덮어쓰기
+lore synthesize signal --since 2.weeks   # 최근 2주 변경분만 반영
+```
+
+## 동작
+
+1. `lore.config.yaml` 의 `domains[<category>]` 검증
+2. 모든 프로젝트에서 해당 카테고리 어노테이션 추출
+3. 기존 `.lore/flows/<category>.md` 본문 (있으면) 로드
+4. L1 + L2 + L3 를 합쳐 [synthesize 프롬프트](https://github.com/terracelab/lore-ai/blob/main/packages/core/src/prompts.ts) 생성
+
+## 출력 규약
+
+- 프롬프트는 H1 1개 + H2 다수의 마크다운을 요구
+- frontmatter 는 LLM 이 만들지 않음 (CLI 가 prepend)
+- H2 ≥ 20자 본문 (RAG 청크 최소 길이)
+
+## 권장 워크플로 (v0)
+
+`--apply` 가 v0.2 까지 미구현이므로:
+
+```bash
+lore synthesize signal | pbcopy   # macOS 의 경우
+# Claude Code 에 붙여넣기 → 응답을 .lore/flows/signal.md 본문에 (frontmatter 제외) 저장
+```
+
+이후 `lore sync` 를 한 번 더 실행해 frontmatter 를 갱신합니다.

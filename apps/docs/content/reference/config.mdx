@@ -1,0 +1,63 @@
+---
+title: lore.config.yaml
+description: 전체 스키마 레퍼런스.
+---
+
+# `lore.config.yaml`
+
+전체 스키마와 기본값입니다. 모든 필드는 [zod 스키마](https://github.com/terracelab/lore-ai/blob/main/packages/core/src/config.ts) 와 1:1 매핑됩니다.
+
+```yaml
+version: 1                       # 항상 1 (v0)
+
+projects:
+  server:                        # 키는 자유 — `--project <key>` 로 지정 가능
+    root: ./backend              # 상대 경로 (config 기준)
+    language: python             # 'python' | 'typescript'
+    include:                     # glob 배열 (최소 1개)
+      - "**/views.py"
+      - "**/models.py"
+    exclude: []                  # 기본 빈 배열
+    output: null                 # (deprecated) 단일 통파일 출력 경로
+
+domains:                          # L1 토큰
+  auth:
+    label: 인증                  # 사람이 읽는 표시명
+    subdomains: [profile, session]
+
+flows:
+  dir: ./.lore/flows             # L2 출력 디렉토리
+  indexFile: INDEX.md            # 자동 생성 인덱스 파일명
+
+extract:
+  requireDomain: true
+  requireBusinessLogic: true
+  requireHistoryOnDataChange: warn   # 'strict' | 'warn' | 'off'
+  minSubstantiveLines: 5
+
+llm:
+  provider: anthropic            # 'anthropic' | 'openai'
+  model: claude-opus-4-7
+  apiKeyEnv: ANTHROPIC_API_KEY
+  temperature: 0.3
+
+publish:                          # 선택
+  target: ~/dev/projects/onboarding/lore-board
+  branch: main
+  project: airpoint              # content/projects/<project>/ 디렉토리명
+  mode: direct                   # 'direct' | 'pr'
+  authorName: "Lore Bot"
+  authorEmail: "lore@terracelab.co.kr"
+  prefix: "chore(docs): sync"
+  skipPaths:
+    - content/handbook/**
+    - content/projects.json
+
+dashboard:                        # v1+
+  enabled: false
+  port: 4321
+```
+
+## 검증
+
+`lore` 의 모든 명령은 시작 시 config 를 zod 로 검증합니다. 잘못된 값은 위치·고치는 법까지 출력됩니다.

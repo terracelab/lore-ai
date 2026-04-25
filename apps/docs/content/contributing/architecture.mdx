@@ -1,0 +1,61 @@
+---
+title: 내부 아키텍처
+---
+
+# 내부 아키텍처
+
+## 패키지 의존성
+
+```
+       ┌──────────────┐
+       │ @lore-ai/    │
+       │   parser     │ ──── (workspace) ────┐
+       └─────┬────────┘                      │
+             │                               │
+             │ depends                       │
+             ▼                               │
+       ┌──────────────┐                      │
+       │ @lore-ai/    │                      │
+       │   core       │ ◀────────────────────┤
+       └─────┬────────┘                      │
+             │                               │
+       ┌─────▼─────────┐                     │
+       │  lore-ai      │ depends on both ────┘
+       │   (CLI bin)   │
+       └───────────────┘
+```
+
+- **`@lore-ai/core`** — 순수 TS, 의존성 최소 (zod + yaml). side effect 없음.
+- **`@lore-ai/parser`** — substantive-file 검출. v0 는 regex, v1 에서 tree-sitter.
+- **`lore-ai`** (CLI) — `commander` 라우팅 + 위 두 패키지 호출.
+
+## 데이터 플로우
+
+```text
+source files (.py, .ts, .tsx)
+        │
+        │  fast-glob
+        ▼
+files: string[]
+        │
+        │  @lore-ai/core/extractor
+        ▼
+Annotation[]
+        │
+        ├── checker → CheckIssue[] → exit 1
+        │
+        ├── markdown.renderL3 → per-symbol fact md
+        │
+        └── extractor.groupByCategory → Map<slug, Annotation[]>
+                │
+                │  markdown.renderFlow + renderFrontmatter
+                ▼
+         .lore/flows/<slug>.md
+```
+
+## 주요 결정
+
+- **단일 통파일 출력 deprecate** — Lore Board 가 카테고리별 라우트를 쓰므로 항상 카테고리당 1 파일.
+- **regex-first parser** — tree-sitter 네이티브 바인딩 회피로 zero-build npm install 보장. v1 에서 트리시터 도입 시 fallback 으로 regex 유지.
+- **frontmatter contract 동결** — Lore Board 와 한 곳에서만 정의, 양쪽 codegen 가능성 열어둠 ([reference/frontmatter](/reference/frontmatter)).
+- **`workspace:*`** — 모노레포 안에서는 latest 항상 사용. 배포 시 changesets 가 실제 버전으로 치환.

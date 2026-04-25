@@ -1,0 +1,66 @@
+version: 1
+
+projects:
+  server:
+    root: ./backend
+    language: python
+    include:
+      - "**/views.py"
+      - "**/views/*.py"
+      - "**/models.py"
+      - "**/services.py"
+      - "**/tasks/*.py"
+      - "**/celery_beat/tasks/*.py"
+    exclude:
+      - "**/__init__.py"
+      - "**/tests.py"
+      - "**/migrations/**"
+
+  client:
+    root: ./app
+    language: typescript
+    include:
+      - "app/**/*.{ts,tsx}"
+      - "components/**/*.{ts,tsx}"
+      - "hooks/**/*.ts"
+      - "stores/**/*.ts"
+      - "controllers/**/*.ts"
+    exclude:
+      - "**/*.test.*"
+      - "**/node_modules/**"
+
+domains:
+  auth:
+    label: 인증
+    subdomains: [profile, session, oauth]
+  subscription:
+    label: 구독
+    subdomains: [master, renewal, trial]
+  signal:
+    label: 시그널
+    subdomains: [detection, publishing]
+  notification:
+    label: 알림
+    subdomains: [trigger, delivery]
+
+flows:
+  dir: ./.lore/flows
+  indexFile: INDEX.md
+
+extract:
+  requireDomain: true
+  requireBusinessLogic: true
+  requireHistoryOnDataChange: warn
+  minSubstantiveLines: 5
+
+llm:
+  provider: anthropic
+  model: claude-opus-4-7
+  apiKeyEnv: ANTHROPIC_API_KEY
+  temperature: 0.3
+
+publish:
+  target: ~/dev/projects/onboarding/lore-board
+  branch: main
+  project: my-project
+  mode: direct

@@ -1,0 +1,15 @@
+---
+title: Exit Codes
+---
+
+# Exit Codes
+
+| Code | 의미 |
+|------|------|
+| `0` | 성공 |
+| `1` | 일반 에러 (검증 실패, 필수 파일 누락 등) |
+| `2` | 잘못된 인자 / 옵션 |
+| `3` | I/O 에러 (파일 읽기/쓰기 실패) |
+| `4` | 외부 API 에러 (synthesize / chat 의 LLM 호출) |
+
+CI 에서 `lore check` · `lore sync --dry-run` 만 게이트로 두는 것을 권장합니다.

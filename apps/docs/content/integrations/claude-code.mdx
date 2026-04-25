@@ -1,0 +1,38 @@
+---
+title: Claude Code 통합
+---
+
+# Claude Code 통합
+
+[Claude Code](https://claude.com/claude-code) 에서 `@lore` 로 도메인 컨텍스트를 자동 주입합니다.
+
+## 설정
+
+워크스페이스 루트에 `.mcp.json` 추가:
+
+```json
+{
+  "mcpServers": {
+    "lore": {
+      "command": "npx",
+      "args": ["-y", "lore-ai", "mcp"]
+    }
+  }
+}
+```
+
+> ⚠ MCP 서버 (`lore mcp`) 는 v0.2 에서 출시됩니다. v0 사용자는 아래 "수동 컨텍스트" 절을 따르세요.
+
+## 수동 컨텍스트 (v0)
+
+`.lore/flows/*.md` 파일이 워크스페이스에 있으면 Claude Code 가 자동으로 인지합니다. 다음 한 줄을 `CLAUDE.md` 에 추가하면 강제 참조됩니다:
+
+```md
+도메인 맥락은 항상 `.lore/flows/*.md` 와 `.lore/DOMAIN_MAP.md` 를 참조해 답할 것.
+```
+
+## 권장 워크플로
+
+1. 새 코드를 짤 때 `.lore/flows/<카테고리>.md` 를 사이드 패널에 띄워두기
+2. 의미가 큰 변경 후 `lore sync` → 갱신된 마크다운이 자동 반영
+3. 회사 위키와 연결하려면 `lore publish` → [Lore Board](/concepts/lore-board)

@@ -1,0 +1,76 @@
+---
+title: Django 프로젝트에 Lore AI 도입
+---
+
+# Django 프로젝트에 Lore AI 도입
+
+## 1. 설치
+
+```bash
+npm i -g lore-ai
+cd backend
+lore init --template django-expo
+```
+
+## 2. include 패턴 조정
+
+`lore.config.yaml` 의 server 프로젝트:
+
+```yaml
+projects:
+  server:
+    root: ./
+    language: python
+    include:
+      - "apps/**/views.py"
+      - "apps/**/views/*.py"
+      - "apps/**/models.py"
+      - "apps/**/services.py"
+      - "apps/**/tasks/*.py"
+    exclude:
+      - "**/__init__.py"
+      - "**/migrations/**"
+      - "**/tests.py"
+```
+
+## 3. 첫 주석
+
+대표 모델 한두 개에 추가:
+
+```python
+class Subscription(models.Model):
+    """
+    @Domain: subscription/master
+    @BusinessLogic: valid_until 지나면 is_active=False
+    @History:
+      - 2024-03-15: trial 7일 → 14일
+    """
+```
+
+## 4. precommit (pre-commit 프레임워크)
+
+`.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: lore-check
+        name: Lore AI annotation check
+        entry: bash -c 'lore check "$@"' --
+        language: system
+        types: [python]
+```
+
+## 5. CI
+
+`.github/workflows/ci.yml` 에 한 단계 추가:
+
+```yaml
+- name: Lore AI sync drift check
+  run: |
+    lore sync
+    git diff --exit-code .lore/
+```
+
+sync 결과가 커밋된 것과 다르면 CI 실패 → 어노테이션 변경분이 PR 에 반드시 포함됩니다.

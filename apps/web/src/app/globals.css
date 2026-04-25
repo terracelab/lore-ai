@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 250 250 249;
+  --fg: 24 24 27;
+  --muted: 82 82 91;
+  --primary: 124 58 237;
+  --accent: 5 150 105;
+  --border: 228 228 231;
+
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+.dark {
+  --bg: 10 10 11;
+  --fg: 244 244 245;
+  --muted: 113 113 122;
+  --primary: 167 139 250;
+  --accent: 52 211 153;
+  --border: 39 39 42;
+}
+
+html,
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+::selection {
+  background: rgb(var(--primary) / 0.25);
+}

@@ -1,0 +1,58 @@
+---
+title: React Native (Expo) 프로젝트에 Lore AI 도입
+---
+
+# React Native (Expo)
+
+## 1. 설치 (devDependency 권장)
+
+```bash
+pnpm add -D lore-ai
+pnpm exec lore init --template django-expo
+```
+
+`--template django-expo` 는 client 프로젝트도 함께 시드합니다.
+
+## 2. include 패턴
+
+```yaml
+projects:
+  client:
+    root: ./
+    language: typescript
+    include:
+      - "app/**/*.{ts,tsx}"
+      - "components/**/*.{ts,tsx}"
+      - "hooks/**/*.ts"
+      - "stores/**/*.ts"
+      - "controllers/**/*.ts"
+    exclude:
+      - "**/*.test.*"
+      - "**/node_modules/**"
+```
+
+## 3. 컴포넌트 주석
+
+```tsx
+/**
+ * @Domain auth/profile
+ * @BusinessLogic 구독 등급 + trial 남은일수 + 투자 성향 뱃지 표기
+ * @Flow profile-display
+ */
+export default function ProfileCard({ userInfo }: Props) {
+  // ...
+}
+```
+
+## 4. precommit (Husky)
+
+```bash
+pnpm dlx husky-init && pnpm install
+echo 'pnpm exec lore-ai check $(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(ts|tsx)$" || true)' \
+  > .husky/pre-commit
+chmod +x .husky/pre-commit
+```
+
+## 5. EAS / CI
+
+EAS Build 의존성 캐시 때문에 CI 에서 lore-ai 가 누락될 수 있습니다. `package.json` 의 `dependencies` 가 아닌 `devDependencies` 로 두는 것을 권장합니다.

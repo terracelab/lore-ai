@@ -1,0 +1,30 @@
+---
+title: Cursor 통합
+---
+
+# Cursor 통합
+
+`.cursor/rules/lore.mdc` 파일을 추가하세요:
+
+```mdc
+---
+description: Lore AI rules — always reference business logic docs.
+globs:
+  - "**/*.{py,ts,tsx}"
+alwaysApply: true
+---
+
+도메인 맥락은 `.lore/flows/*.md` 와 `.lore/DOMAIN_MAP.md` 에서 가져옵니다.
+새 비즈니스 로직 함수/클래스를 추가할 때 `@Domain` / `@BusinessLogic` 주석을 함께 작성하세요.
+```
+
+## precommit 훅 (Husky)
+
+```bash
+pnpm dlx husky-init && pnpm install
+echo 'npx lore-ai check $(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(py|ts|tsx)$" || true)' \
+  > .husky/pre-commit
+chmod +x .husky/pre-commit
+```
+
+`pre-commit` 프레임워크를 쓰는 Python 모노레포라면 `templates/hooks/pre-commit.sh` 를 참고하세요.

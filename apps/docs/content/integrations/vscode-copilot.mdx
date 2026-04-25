@@ -1,0 +1,26 @@
+---
+title: VSCode Copilot 통합
+---
+
+# VSCode Copilot 통합
+
+별도 설치는 필요 없습니다. `lore sync` 로 만든 `.lore/flows/*.md` 가 워크스페이스 안에 있으면 GitHub Copilot 이 자동으로 컨텍스트로 사용합니다.
+
+## 추가 가속
+
+`.vscode/settings.json`:
+
+```json
+{
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true
+}
+```
+
+`.github/copilot-instructions.md`:
+
+```md
+이 워크스페이스의 도메인 맥락은 `.lore/flows/*.md` 와 `.lore/DOMAIN_MAP.md` 에 있습니다.
+새 코드를 작성할 때 항상 해당 파일을 먼저 읽고, `@Domain` / `@BusinessLogic` 주석을 함께 작성하세요.
+```
+
+`templates/ai/copilot-instructions.md` 에 더 자세한 템플릿이 있습니다.

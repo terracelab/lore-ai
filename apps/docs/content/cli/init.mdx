@@ -1,0 +1,40 @@
+---
+title: lore init
+---
+
+# `lore init`
+
+워크스페이스에 `lore.config.yaml` · `.lore/flows/` · `.lore/DOMAIN_MAP.md` 를 생성합니다.
+
+```bash
+lore init [--template <name>] [--yes]
+```
+
+## 옵션
+
+| 플래그 | 기본값 | 설명 |
+|--------|--------|------|
+| `--template <name>` | `custom` | `django-expo` · `nextjs` · `custom` |
+| `--yes`, `-y` | false | 기존 파일 덮어쓰기 동의 |
+
+## 동작
+
+1. `lore.config.yaml` 가 없으면 시드 설정 생성
+2. `.lore/flows/` 디렉토리 생성
+3. `.lore/DOMAIN_MAP.md` 시드 작성
+4. 다음 단계 콘솔 안내 출력
+
+## Lore Board 등록 안내
+
+`lore init` 은 외부 Lore Board 의 `projects.json` 을 자동으로 건드리지 않습니다. 이유는 [개념: Lore Board](/concepts/lore-board#보호-경로) 참고.
+
+대신 콘솔에 등록 스니펫이 출력됩니다:
+
+```text
+Next steps — Lore Board 에 이 프로젝트를 등록하려면:
+  1. lore-board 레포의 content/projects.json 에 다음 항목 추가:
+
+     { "slug": "foodcook", "name": "...", "icon": "🍚", "order": 2, "status": "draft" }
+
+  2. lore publish 로 첫 동기화
+```

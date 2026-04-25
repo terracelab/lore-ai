@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lore": {
+      "command": "npx",
+      "args": ["-y", "lore-ai", "mcp"]
+    }
+  }
+}
