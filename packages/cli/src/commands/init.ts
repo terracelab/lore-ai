@@ -105,6 +105,12 @@ export async function initCommand(options: InitOptions): Promise<void> {
   log.hint('1. Edit lore.config.yaml — adjust `projects.*.include` and `domains`.');
   log.hint('2. Add @Domain / @BusinessLogic to a few key files.');
   log.hint('3. Run `lore check` then `lore sync`.');
-  log.hint('4. To register this project in Lore Board, edit content/projects.json:');
+  log.hint('');
+  log.hint('AI 에디터로 코딩한다면 어노테이션 spec drift 를 막기 위해:');
+  log.hint('- CLAUDE.md  (Claude Code) → templates/ai/CLAUDE.md 복사');
+  log.hint('- .github/copilot-instructions.md → templates/ai/copilot-instructions.md 복사');
+  log.hint('- 더 강한 가드레일: https://docs.lore-ai.vercel.app/guides/ai-harness');
+  log.hint('');
+  log.hint('Lore Board 에 이 프로젝트를 등록하려면 content/projects.json 에:');
   log.hint('   { "slug": "<your-slug>", "name": "...", "icon": "🔵", "order": 1, "status": "draft" }');
 }
