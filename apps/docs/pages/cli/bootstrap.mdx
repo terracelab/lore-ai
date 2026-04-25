@@ -1,0 +1,144 @@
+---
+title: lore bootstrap
+description: 코드베이스에서 자동 수집한 evidence + AI 프롬프트로 도메인 맵 초안 생성.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# `lore bootstrap`
+
+`lore.config.yaml` 의 `domains:` 와 `.lore/DOMAIN_MAP.md` 를 코드베이스의 실제 폴더 구조에 맞춰 자동으로 채우기 위한 **프롬프트** 또는 **휴리스틱 초안** 을 생성합니다.
+
+```bash
+lore bootstrap                  # AI 용 프롬프트를 stdout 으로 (기본)
+lore bootstrap --heuristic-only # AI 없이 정적 초안만 stdout 으로
+lore bootstrap --out prompt.md  # 프롬프트를 파일로 저장
+lore bootstrap --apply          # v0.2: Anthropic SDK 직접 호출 → 두 파일 자동 작성
+```
+
+## 5단계 흐름에서의 위치
+
+```text
+lore init           ← config + .lore/ 스캐폴드
+   ↓
+lore bootstrap      ← ★ 여기 (도메인 맵 초안)
+   ↓
+(AI 또는 사람이) 코드에 @Domain · @BusinessLogic · @History 작성
+   ↓
+lore check          ← 누락 검증
+   ↓
+lore sync           ← .lore/flows/<카테고리>.md 생성
+```
+
+## 동작
+
+### 1. Evidence 자동 수집
+
+`lore.config.yaml` 의 `projects.*.include` 글롭으로 파일을 모은 뒤 언어별 휴리스틱 적용:
+
+- **Python (Django)**: 폴더 구조에서 앱을 추출. `<app>/models.py` · `<app>/models/*.py` · `<app>/views.py` · `<app>/views/**/*.py` · `<app>/services/**/*.py` 등 모두 인식. 각 파일에서 `class Foo` · `def bar` 정규식으로 심볼 이름 수집.
+- **TypeScript (Next/RN)**: `pages/`, `components/`, `stores/`, `hooks/`, `api/`, `schemas/`, `controllers/`, `router/`, `features/`, `screens/`, `modules/` 같은 1단 카테고리 폴더 추출 + 각 폴더의 즉시 자식 항목 (폴더명 또는 파일 basename).
+
+### 2. 프롬프트 빌드
+
+수집된 evidence + 빡빡한 규칙 + 출력 contract 를 한 프롬프트로 조립.
+
+규칙:
+
+- 도메인 key 는 영문 소문자 단수형
+- subdomains 는 evidence 에 실제로 등장한 단어만
+- placeholder (`example`, `foo`) 금지
+- yaml 의 도메인 set == DOMAIN_MAP.md 의 도메인 set (정확히 일치)
+- 한국어 label, 영문 key
+
+### 3. stdout 출력
+
+→ Claude Code / Cursor / 다른 AI 에 그대로 붙여넣기.
+
+## 예시 출력 (Django 백엔드)
+
+```text
+You are bootstrapping the Lore AI domain map for this workspace.
+
+# Evidence (auto-collected from lore.config.yaml include globs)
+
+## server (python)
+
+- **attendance/** — views: AttendanceCheckAPIView, MonthlyAttendanceAPIView
+- **candidate/** — views: CandidateProfileAPIView, CandidateQuestionsAPIView, … (+5) |
+                   services: calculate_real_matching_score, check_job_suitability, … (+8)
+- **job/** — views: JobMatchingListAPIView | services: calculate_matching_score, …
+- **notice/** — views: NoticeDetailAPIView, NoticeListAPIView
+- **user/** — views: KakaoOAuthLoginURLView, PhoneVerificationRequestAPIView, …
+
+# Rules
+
+1. Domain key — English lowercase singular noun ...
+2. Subdomains — must be words actually present in the evidence above ...
+...
+
+# Output — diff-only, two file blocks
+...
+```
+
+## `--heuristic-only` (AI 없이)
+
+API key 가 없거나 즉시 결과가 필요할 때 — 폴더 이름만으로 도메인 후보 + subdomains 초안. 결과는 거칠지만 *완전히 빈 시드* 보다 빠른 시작.
+
+```yaml
+domains:
+  candidate:
+    label: candidate    # TODO: 한국어 라벨로
+    subdomains: [service, api]    # TODO: 정제
+  job:
+    label: job
+    subdomains: [service, api]
+  ...
+```
+
+이후 사람이 한국어 라벨 / subdomain 정제 / 한 줄 설명만 채우면 됨.
+
+## `--apply` (v0.2 예정)
+
+Anthropic SDK 호출 → 응답을 파싱 → `lore.config.yaml` 의 `domains:` 블록 + `.lore/DOMAIN_MAP.md` 직접 작성.
+
+지금 (v0) 사용자는 stdout → Claude Code 붙여넣기 → 응답 → 두 파일 수동 반영. 한 번이면 끝나는 작업이라 v0 에서도 큰 부담 없음.
+
+## 옵션
+
+| 플래그 | 기본 | 설명 |
+|--------|------|------|
+| `--heuristic-only` | false | AI 없이 정적 초안 (yaml + DOMAIN_MAP) 출력 |
+| `--out <path>` | — | 프롬프트를 파일로 (기본은 stdout) |
+| `--apply` | false | v0.2 — LLM 직접 호출 + 자동 작성 |
+
+## 트러블슈팅
+
+### "No source evidence found"
+
+`projects.*.include` 글롭이 너무 좁거나 `root` 가 잘못된 경우. 확인:
+
+```bash
+# 실제로 매치되는 파일이 있나?
+git ls-files '<glob>' | head
+```
+
+기본 시드 (`lore init`) 의 Python 패턴은 단일 파일 (`**/views.py`) + 디렉토리 (`**/views/**/*.py`) 둘 다 잡습니다. RN/Next 는 `app/`, `src/pages/` 등을 자동 인식.
+
+### 어떤 앱이 안 잡히는데?
+
+다음 중 하나입니다:
+
+- `__init__.py` 만 있고 다른 파일이 없는 dummy 패키지 → `exclude` 에 잡혀서 제외됨 (정상)
+- `models/`, `views/`, `services/` 디렉토리도 아니고 카테고리 식별자가 없는 비표준 레이아웃 → include 패턴을 추가하거나 직접 도메인에 등록
+- `config/`, `core/` 같은 *인프라성* 이름 → 명시적으로 제외 (도메인이 아니라 설정/공통)
+
+### subdomain 이 너무 일반적 (`api`, `service`)
+
+`--heuristic-only` 의 한계 — 실제 의미는 코드의 클래스/함수 이름에 있으므로 LLM 모드 (`lore bootstrap` 기본) 가 훨씬 나은 결과를 줍니다.
+
+## 다음
+
+- [Quickstart](/getting-started/quickstart) — 5단계 전체 흐름
+- [어노테이션 스펙](/concepts/annotations) — 도메인 토큰을 정한 후 작성할 주석 규칙
+- [reference/config](/reference/config) — `lore.config.yaml` 전체 스키마

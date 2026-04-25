@@ -5,5 +5,6 @@ export * from './checker.js';
 export * from './markdown.js';
 export * from './extractor.js';
 export * from './prompts.js';
+export * from './bootstrap.js';
 
 export const VERSION = '0.0.0';

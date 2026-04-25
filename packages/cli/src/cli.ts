@@ -2,6 +2,7 @@ import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
+import { bootstrapCommand } from './commands/bootstrap.js';
 import { checkCommand } from './commands/check.js';
 import { syncCommand } from './commands/sync.js';
 import { synthesizeCommand } from './commands/synthesize.js';
@@ -24,6 +25,14 @@ export function buildProgram(): Command {
     .option('--template <name>', 'starter template (django-expo | nextjs | custom)', 'custom')
     .option('-y, --yes', 'accept all defaults')
     .action(initCommand);
+
+  program
+    .command('bootstrap')
+    .description('Build a domain-map prompt (or heuristic draft) from your codebase')
+    .option('--apply', 'directly call the LLM API and write the result (v0.2)')
+    .option('--heuristic-only', 'skip the LLM and emit a static draft from folder structure')
+    .option('--out <path>', 'write the prompt to a file instead of stdout')
+    .action(bootstrapCommand);
 
   program
     .command('check [files...]')
@@ -75,7 +84,12 @@ const invokedDirectly =
 
 if (invokedDirectly) {
   run().catch((err) => {
-    console.error(err);
+    if (err instanceof Error) {
+      console.error(`✗ ${err.message}`);
+      if (process.env.LORE_DEBUG) console.error(err.stack);
+    } else {
+      console.error(err);
+    }
     process.exit(1);
   });
 }

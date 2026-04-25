@@ -20,22 +20,26 @@ projects:
     language: python
     include:
       - "**/views.py"
-      - "**/views/*.py"
+      - "**/views/**/*.py"
       - "**/models.py"
+      - "**/models/**/*.py"
       - "**/services.py"
-      - "**/tasks/*.py"
+      - "**/services/**/*.py"
+      - "**/tasks.py"
+      - "**/tasks/**/*.py"
     exclude:
       - "**/__init__.py"
       - "**/tests.py"
+      - "**/tests/**"
       - "**/migrations/**"
+      - "**/admin.py"
+      - "**/admins/**"
 
-domains:
-  auth:
-    label: 인증
-    subdomains: [profile, session]
-  example:
-    label: 예시 도메인
-    subdomains: [foo, bar]
+domains: {}
+  # 비워두고 \`lore bootstrap\` 으로 자동 채우거나 직접 추가:
+  # auth:
+  #   label: 인증
+  #   subdomains: [profile, session]
 
 flows:
   dir: ./.lore/flows

@@ -152,6 +152,9 @@ importers:
 
   packages/core:
     dependencies:
+      fast-glob:
+        specifier: ^3.3.2
+        version: 3.3.3
       yaml:
         specifier: ^2.5.1
         version: 2.8.3

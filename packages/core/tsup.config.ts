@@ -9,6 +9,7 @@ export default defineConfig({
     'src/markdown.ts',
     'src/extractor.ts',
     'src/prompts.ts',
+    'src/bootstrap.ts',
   ],
   format: ['esm'],
   dts: true,
