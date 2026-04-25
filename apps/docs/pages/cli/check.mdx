@@ -4,10 +4,12 @@ title: lore check
 
 # `lore check`
 
-스테이징된 (또는 명시한) 파일에서 어노테이션을 검증합니다. precommit 훅의 엔트리.
+명시한 파일에서 어노테이션을 검증합니다. **인자 없이 실행하면 `lore.config.yaml` 의 모든 `projects.*.include` 글롭으로 매치되는 전체 파일을 스캔** 합니다.
 
 ```bash
-lore check [files...] [--json] [--no-color]
+lore check                                          # 전체 스캔
+lore check apps/auth/views.py                       # 일부만
+lore check $(git diff --cached --name-only)         # precommit
 ```
 
 ## 옵션
