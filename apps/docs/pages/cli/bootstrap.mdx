@@ -65,9 +65,15 @@ lore sync           ← .lore/flows/<카테고리>.md 생성
 - yaml 의 도메인 set == DOMAIN_MAP.md 의 도메인 set (정확히 일치)
 - 한국어 label, 영문 key
 
-### 3. stdout 출력
+### 3. stdout 출력 → AI 에디터에 붙여넣기 → **수정안 적용 지시**
 
-→ Claude Code / Cursor / 다른 AI 에 그대로 붙여넣기.
+`lore bootstrap` 자체는 파일을 고치지 않습니다. 이렇게 진행:
+
+1. 프롬프트를 Claude Code / Cursor / Copilot 에 붙여넣기
+2. AI 가 두 파일 (`lore.config.yaml` 의 `domains:` 블록 + `.lore/DOMAIN_MAP.md` 전체) 의 diff 를 응답으로 줌
+3. **그 응답을 받은 직후** AI 에게 *"위 diff 를 실제로 두 파일에 적용해줘"* 한 번 더 지시 — Claude Code 는 Edit/Write 툴로 직접 파일을 고침
+4. `git diff lore.config.yaml .lore/DOMAIN_MAP.md` 로 육안 검증
+5. `lore check` 가 ✓ 로 떨어지면 1차 정상
 
 ## 예시 출력 (Django 백엔드)
 

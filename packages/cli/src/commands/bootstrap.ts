@@ -69,9 +69,11 @@ export async function bootstrapCommand(options: BootstrapOptions): Promise<void>
       (totalSiblings > 0 ? ` + ${totalSiblings} untracked sibling(s)` : '') +
       '.',
   );
-  log.hint('Paste the prompt above into Claude Code or your AI editor.');
-  log.hint('After approval:');
-  log.hint('  • Replace `domains:` (and `projects:` if siblings were proposed) in lore.config.yaml');
-  log.hint('  • Overwrite .lore/DOMAIN_MAP.md');
-  log.hint('Then run `lore check` and `lore sync`.');
+  log.hint('Paste the prompt above into Claude Code (or your AI editor).');
+  log.hint('AI 가 diff 응답을 주면, 그 다음에 AI 에게 한 번 더 지시:');
+  log.hint('  → "위 diff 를 lore.config.yaml 과 .lore/DOMAIN_MAP.md 에 직접 적용해줘"');
+  log.hint('확인:');
+  log.hint('  git diff lore.config.yaml .lore/DOMAIN_MAP.md');
+  log.hint('  lore check         # ✓ 면 정상');
+  log.hint('  lore sync          # .lore/flows/<카테고리>.md 생성');
 }
