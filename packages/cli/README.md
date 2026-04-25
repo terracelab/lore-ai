@@ -27,7 +27,7 @@ See full docs at <https://docs.lore-ai.vercel.app>.
 - `lore init` — scaffold config + flows directory
 - `lore check [files…]` — validate annotations (precommit)
 - `lore sync` — regenerate L2 / L3 markdown
-- `lore synthesize <category>` — emit / apply LLM prompt for a flow
+- `lore synthesize [category]` — emit LLM prompt for one flow, or omit category for all-in-one
 - `lore publish` — copy `.lore/flows/` to a Lore Board target
 - `lore chat` — local RAG REPL (v0.2)
 

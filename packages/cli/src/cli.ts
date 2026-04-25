@@ -49,8 +49,8 @@ export function buildProgram(): Command {
     .action(syncCommand);
 
   program
-    .command('synthesize <category>')
-    .description('Build an LLM prompt (or call the API) to refresh a single L2 flow')
+    .command('synthesize [category]')
+    .description('Build an LLM prompt to refresh L2 flow(s) — omit category for all-in-one')
     .option('--apply', 'call the LLM API directly and overwrite the flow file')
     .option('--since <range>', 'limit to commits in this range (e.g. 2.weeks)')
     .action(synthesizeCommand);
