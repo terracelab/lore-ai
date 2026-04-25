@@ -1,0 +1,291 @@
+---
+title: AI 코딩 하네스 — 어노테이션 강제 가드레일
+description: Claude Code · Cursor · Copilot 으로 코딩할 때 Lore AI 어노테이션을 LLM 이 자체적으로 유지하게 만드는 4-층 방어 셋업.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# AI 코딩 하네스
+
+> **문제**: 바이브 코딩 (vibe coding) 의 가장 큰 약점은 **나중에 추적이 안 된다**는 것. LLM 세션이 끝나면 *왜 이렇게 짰는지* 가 휘발됩니다.
+>
+> **Lore AI 의 답**: 어노테이션 (`@Domain` / `@BusinessLogic` / `@History`) 이 **영속 레이어** 입니다. 하네스의 일은 *코딩하는 동안* LLM 이 이 영속 레이어를 매 단계 강제로 사용하게 만드는 것.
+
+<Callout>
+  본 페이지의 셋업은 **opt-in** 입니다. `lore init` 은 자동으로 적용하지 않습니다. 팀 / 프로젝트 성향에 맞춰 직접 설치하세요. 너무 강하면 vibe coding 속도가 죽고, 너무 약하면 추적성 무너집니다.
+</Callout>
+
+## 4-층 방어
+
+| 층 | 강도 | 도구 | 역할 |
+|----|------|------|------|
+| 1. **Instruction** | 약 (확률적) | `CLAUDE.md`, `.cursor/rules/*.mdc`, copilot-instructions | "이렇게 해라" 어드바이스. 긴 세션에 drift |
+| 2. **Context Injection** | 중 | MCP server (v0.2) 또는 SessionStart hook | 편집 *전* LLM 이 도메인 맥락을 받음 |
+| 3. **Tool Hook** (real-time gate) | **강** | Claude Code `PreToolUse` / `PostToolUse` 훅 | 매 Edit/Write 마다 검증, 실패를 LLM 컨텍스트에 즉시 피드백 |
+| 4. **CI / Precommit** | 매우 강 | `lore check` precommit, GitHub Actions drift | 사람·LLM 누구도 우회 못 함 |
+
+3 층이 핵심입니다. 1·4 만으로는 *"LLM 이 잊고 빠뜨림 → 사람이 commit 시도 → 차단당함 → 사람이 수정"* 의 수동 루프. 3 층이 있으면 **LLM 이 자기 출력을 자기가 교정** 합니다.
+
+## 권장 셋업 (Claude Code · 지금 바로)
+
+세 파일만 추가하면 됩니다.
+
+### 1. `.claude/settings.json` — 훅 3종
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [{
+          "type": "command",
+          "command": "test -f .lore/DOMAIN_MAP.md && cat .lore/DOMAIN_MAP.md && echo '\\n---\\n등록된 도메인 토큰:' && grep -h '^slug:' .lore/flows/*.md 2>/dev/null | sed 's/slug: /  - /'"
+        }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "f=\"$CLAUDE_TOOL_INPUT_file_path\"; case \"$f\" in *.py|*.ts|*.tsx) lore check \"$f\" 2>&1 | head -30 ;; esac"
+        }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{
+          "type": "command",
+          "command": "changed=$(git diff --name-only --diff-filter=ACM HEAD 2>/dev/null | grep -E '\\.(py|tsx?)$' || true); [ -z \"$changed\" ] && exit 0; echo '— Lore drift check —'; lore check $changed 2>&1 | tail -15; echo; lore sync --dry-run 2>&1 | tail -5"
+        }]
+      }
+    ]
+  }
+}
+```
+
+세 훅의 역할:
+
+| 훅 | 시점 | 결과 |
+|----|------|------|
+| `SessionStart` | Claude Code 시작 시 | 도메인 맵 + 활성 슬러그를 컨텍스트에 자동 주입. LLM 이 *처음부터* 도메인 어휘를 안다 |
+| `PostToolUse` (`Edit`/`Write`) | 파일 편집 직후 | 해당 파일에 `lore check` 실행. 누락 사항이 있으면 stderr → LLM 다음 메시지의 컨텍스트로 자동 유입 → **자체 수정 시도** |
+| `Stop` | 한 턴 종료 시 | 변경된 모든 파일의 종합 검증 + sync drift. 사용자가 다음 명령을 내리기 전에 빠진 것이 보임 |
+
+### 2. `CLAUDE.md` — LLM 행동 규칙
+
+```md
+# Lore AI 워크스페이스 규칙
+
+이 저장소는 [Lore AI](https://lore-ai.vercel.app) 로 비즈니스 로직을 문서화합니다.
+**모든 코드 변경은 다음 규칙을 따라야 합니다.**
+
+## 편집 전
+
+비즈니스 로직 파일을 수정하기 전, **`.lore/flows/<해당 카테고리>.md`** 와
+**`.lore/DOMAIN_MAP.md`** 를 먼저 읽어 도메인 모델을 파악하세요.
+
+## 편집 시
+
+1. **새 비즈니스 함수/클래스/엔드포인트** 추가
+   → `@Domain` + `@BusinessLogic` 주석을 함께 작성
+   → 도메인 토큰은 `lore.config.yaml` 의 `domains:` 에 등록된 것만 사용
+
+2. **데이터 의미 변경** (ENUM 추가/제거, NULL 정책, 기본값, 임계값 변경,
+   백필 없는 마이그레이션 등)
+   → `@History: - YYYY-MM-DD: <변경 내용> (백필 여부)` 항목 추가
+   → 백필이 없으면 **반드시** 명시 ("백필 없음" 또는 "기존 row 영향 없음")
+
+3. 의사결정 배경이 비자명하면 → `@Context: <왜>` 추가
+
+## 편집 후
+
+`PostToolUse` 훅이 `lore check` 를 자동 실행합니다. 출력에 ERROR 가 보이면
+**같은 턴 안에** 어노테이션을 추가/수정하세요. 사용자에게 "끝났다" 보고하기 전에.
+
+## 턴 종료 전
+
+`Stop` 훅의 drift 결과를 확인. 의미가 큰 변경이면 `lore sync` 를 실행하고
+변경된 `.lore/flows/` 도 함께 커밋 후보에 포함시키세요.
+
+## 절대 금지
+
+- 등록되지 않은 도메인 토큰 사용 (대신 `domains:` 에 먼저 추가 제안)
+- `@History` 누락 (의미 변경에 한해)
+- `lore check` 실패를 사용자에게 떠넘기지 않기
+```
+
+### 3. (선택) `.github/workflows/lore.yml` — CI 차단막
+
+LLM 이 우회하든, 사람이 우회하든 PR 단계에서 한 번 더 잡아 줍니다.
+
+```yaml
+name: Lore Drift
+on:
+  pull_request:
+    paths: ['**/*.py', '**/*.ts', '**/*.tsx', 'lore.config.yaml']
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i -g lore-ai
+
+      - name: Annotation check
+        run: |
+          changed=$(git diff --name-only origin/${{ github.base_ref }}... \
+                     | grep -E '\.(py|tsx?)$' || true)
+          [ -z "$changed" ] && exit 0
+          lore check $changed
+
+      - name: Drift check
+        run: |
+          lore sync
+          git diff --exit-code .lore/ || {
+            echo "::error::어노테이션 변경에 대해 lore sync 결과가 커밋되지 않았습니다."
+            exit 1
+          }
+```
+
+## 작동 원리 — 자기 교정 루프
+
+`PostToolUse` 훅이 단순 검증이 아니라 **피드백 루프** 입니다.
+
+```text
+[1] LLM 이 Subscription 모델에 새 필드 추가 (Edit)
+        │
+        ▼
+[2] PostToolUse 훅 trigger
+        │
+        ▼  lore check models.py
+[3] ERROR [require-domain] Missing @Domain at models.py:42
+    fix: Add `@Domain: <token>` (e.g. `@Domain: subscription/master`)
+        │
+        ▼  stderr 가 LLM 의 다음 컨텍스트로 자동 유입
+[4] LLM 의 사고: "@Domain 빠뜨렸네. 다시 Edit 해야겠다."
+        │
+        ▼  Edit (with annotation)
+[5] PostToolUse 훅 retrigger
+        │
+        ▼  lore check models.py
+[6] ✓ Lore check passed.
+        │
+        ▼
+[7] LLM 이 사용자에게 "완료" 보고
+```
+
+사람이 개입할 필요 없이 **LLM 이 자기 결과를 자기가 교정**. 이 자율 루프가 vibe coding 속도를 유지하면서 추적성을 보장하는 핵심입니다.
+
+## Cursor / Copilot 변형
+
+Claude Code 만큼 강한 hook 시스템은 없지만 1·4 층은 동일하게 적용됩니다.
+
+<Tabs items={['Cursor', 'GitHub Copilot']}>
+<Tabs.Tab>
+`.cursor/rules/lore.mdc`:
+
+```mdc
+---
+description: Lore AI annotation discipline.
+globs:
+  - "**/*.py"
+  - "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+이 저장소는 Lore AI 로 비즈니스 로직을 문서화합니다.
+편집 시:
+- 비즈니스 함수/모델/엔드포인트 추가 → `@Domain: <token>` + `@BusinessLogic: <한 줄>` 주석
+- 데이터 의미 변경 → `@History: - YYYY-MM-DD: <변경> (백필 여부)`
+- 도메인 토큰은 `lore.config.yaml` 의 `domains:` 에 등록된 것만 사용
+- 편집 후 `lore check <파일>` 통과 확인
+```
+
+Cursor 는 PostToolUse 훅이 없으므로 **CI 차단막 (4 층)** 이 더 중요합니다.
+</Tabs.Tab>
+<Tabs.Tab>
+`.github/copilot-instructions.md`:
+
+```md
+이 저장소의 도메인 맥락은 `.lore/flows/*.md` 와 `.lore/DOMAIN_MAP.md` 에 있습니다.
+새 비즈니스 로직 추가 시 `@Domain` + `@BusinessLogic` 주석을 함께 작성하세요.
+데이터 의미 변경 시 `@History` 항목을 추가하세요.
+도메인 토큰은 `lore.config.yaml` 의 `domains:` 에 등록된 것만 사용.
+```
+
+`.vscode/settings.json`:
+
+```json
+{ "github.copilot.chat.codeGeneration.useInstructionFiles": true }
+```
+
+Copilot 도 PostToolUse 가 없습니다 — `pre-commit` 프레임워크 + GitHub Actions 의존도가 더 큽니다.
+</Tabs.Tab>
+</Tabs>
+
+## v0.2 — MCP 서버가 추가하는 것
+
+[MCP server](/integrations/mcp) (v0.2 도착 예정) 가 들어오면 LLM 이 편집 *전* 에 `get_domain_context(file_path)` tool 을 호출해 관련 flow 만 정밀하게 받을 수 있습니다.
+
+| 변경 | v0 (지금) | v0.2 (MCP 후) |
+|------|----------|--------------|
+| 도메인 컨텍스트 | SessionStart 훅이 *전체* 주입 | MCP tool 이 *관련 카테고리만* on-demand 주입 |
+| 토큰 비용 | 보통 (한 번에 다 로드) | 낮음 (필요시만) |
+| 정밀도 | 보통 | 높음 |
+
+지금 셋업한 `SessionStart` 훅은 v0.2 에서는 제거하고 `.mcp.json` 으로 교체하면 됩니다.
+
+## 디버깅 · FAQ
+
+### Q. 훅이 발동 안 해요
+
+```bash
+# Claude Code 가 .claude/settings.json 을 읽었는지 확인
+cat .claude/settings.json | jq .
+
+# Claude Code 재시작 후 새 세션에서 hook log 보기
+# (Claude Code 의 IDE 로그 또는 터미널 출력)
+```
+
+훅의 `command` 가 셸로 평가되므로 따옴표 이스케이프 주의. 위 예제는 JSON 안의 문자열에서 `\\.` (정규식의 `\.`), `\\n` (개행) 을 모두 이스케이프했습니다.
+
+### Q. PostToolUse 훅이 너무 자주 발동해서 느려요
+
+`matcher` 를 더 좁힐 수 있습니다:
+
+```json
+"matcher": "Edit"     // Write 는 신규 파일이 많으니 제외
+```
+
+또는 훅 명령 안에서 fast skip:
+
+```bash
+[ -f lore.config.yaml ] || exit 0   # lore-ai 미설치 워크스페이스면 skip
+```
+
+### Q. CLAUDE.md 가 너무 길어서 매 세션 토큰을 먹어요
+
+Claude Code 는 `CLAUDE.md` 를 항상 읽습니다. 본 가이드의 ~50줄은 큰 부담 아니지만, 더 줄이고 싶으면 핵심 5줄만 남기고 나머지는 `.claude/lore-rules.md` 같은 별도 파일로 옮기고 SessionStart 훅이 필요시에만 cat 하게 만드세요.
+
+### Q. 자기 교정 루프가 잘 안 도는데?
+
+- `lore check` 의 출력이 LLM 에게 "고치라" 는 신호로 읽히는지 — `formatIssues()` 의 `fix:` 줄이 핵심. 빠지면 LLM 이 진단만 하고 수정 안 함.
+- `CLAUDE.md` 의 "**같은 턴 안에 수정**" 문구가 명시되어 있어야 함. 모호하면 LLM 이 사용자한테 떠넘김.
+- Claude Code 의 컨텍스트 윈도우가 가득 차면 훅 출력이 잘릴 수 있음 — `lore check` 출력을 `head -20` 정도로 제한.
+
+### Q. 팀 레포에 일괄 적용하고 싶어요
+
+루트의 `.claude/settings.json`, `CLAUDE.md`, `.github/workflows/lore.yml` 세 파일을 git 으로 커밋 → PR 로 머지 → 팀원이 pull 하면 자동 적용됩니다. 기존 `.claude/settings.json` 이 있으면 hook 만 merge.
+
+---
+
+## 다음
+
+- [Claude Code 통합](/integrations/claude-code) — MCP 셋업 (v0.2)
+- [어노테이션 스펙](/concepts/annotations) — 태그 종류와 작성 규칙
+- [데이터 아카이올로지](/concepts/data-archaeology) — `@History` 의 의미
+
+본 가이드는 살아있는 문서입니다. dogfood 결과 좋은 패턴이 나오면 PR 환영 — [GitHub Discussions](https://github.com/terracelab/lore-ai/discussions).

@@ -36,3 +36,7 @@ title: Claude Code 통합
 1. 새 코드를 짤 때 `.lore/flows/<카테고리>.md` 를 사이드 패널에 띄워두기
 2. 의미가 큰 변경 후 `lore sync` → 갱신된 마크다운이 자동 반영
 3. 회사 위키와 연결하려면 `lore publish` → [Lore Board](/concepts/lore-board)
+
+## 어노테이션 강제 (선택)
+
+vibe coding 중 LLM 이 어노테이션을 빠뜨리는 것을 방지하려면 Claude Code 의 hook 시스템 (`PostToolUse`, `SessionStart`, `Stop`) 으로 자기 교정 루프를 만들 수 있습니다. **opt-in** — 팀 성향에 맞춰 채택. 셋업 가이드: [AI 코딩 하네스](/guides/ai-harness).
