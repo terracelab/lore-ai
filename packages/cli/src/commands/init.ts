@@ -97,12 +97,14 @@ lore sync       ← .lore/flows/<카테고리>.md 생성
 | \`lore init\` | 워크스페이스 셋업 |
 | \`lore bootstrap\` | 코드 → 도메인 맵 + projects: 초안 (LLM 프롬프트 출력) |
 | \`lore bootstrap > prompt.md\` | 프롬프트를 파일로 저장 (Claude Code 에 붙여넣기용) |
+| \`lore bootstrap \\| pbcopy\` | 프롬프트를 바로 클립보드로 (macOS) |
 | \`lore bootstrap --heuristic-only\` | AI 없이 정적 초안 |
 | \`lore check\` | 모든 configured projects 전체 검증 |
 | \`lore check <files…>\` | 명시 파일만 검증 (precommit 용) |
 | \`lore sync\` | L2 / L3 마크다운 재생성 |
 | \`lore synthesize\` | 모든 카테고리를 한 프롬프트로 출력 (전체 모드) |
 | \`lore synthesize <카테고리>\` | 단일 L2 flow 재구성 프롬프트 |
+| \`lore synthesize \\| pbcopy\` | 합쳐진 프롬프트를 바로 클립보드로 (macOS) |
 | \`lore publish\` | Lore Board 에 동기화 |
 | \`lore chat\` | 로컬 RAG REPL (v0.2 예정) |
 
@@ -155,11 +157,33 @@ lore bootstrap | pbcopy                   # macOS — 바로 클립보드로
 lore check                                # 전체 스캔
 lore sync                                 # .lore/flows/ 갱신
 
+# L2 flow 재작성 (LLM 사용)
+lore synthesize | pbcopy                  # 모든 카테고리 합쳐서 클립보드 (macOS)
+                                          # → Claude Code 에 붙여넣기 → 파일 자동 갱신
+lore synthesize signal | pbcopy           # 단일 카테고리만
+
 # precommit (husky)
 lore check $(git diff --cached --name-only)
 
 # 디버그
 LORE_DEBUG=1 lore <command>               # stack trace 출력
+\`\`\`
+
+## 클립보드로 바로 복사 — 플랫폼별
+
+| OS | 명령 |
+|----|------|
+| macOS | \`\\| pbcopy\` (기본 내장) |
+| Linux (X11) | \`\\| xclip -selection clipboard\` 또는 \`\\| xsel -b -i\` |
+| Linux (Wayland) | \`\\| wl-copy\` |
+| WSL | \`\\| clip.exe\` |
+| Windows PowerShell | \`\\| Set-Clipboard\` (또는 \`\\| clip\`) |
+| 크로스플랫폼 | \`npm i -g clipboard-cli\` 후 \`\\| clipboard\` |
+
+\`\`\`bash
+# 예 — Linux 사용자
+lore bootstrap | xclip -selection clipboard
+lore synthesize | wl-copy
 \`\`\`
 
 ## AI 에디터 가드레일 (선택)
