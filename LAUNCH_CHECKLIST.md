@@ -142,7 +142,7 @@ pnpm --filter docs dev   # http://localhost:3001
 
 - [ ] CLI 가 실제 워크스페이스에서 일관된 결과를 냄
 - [ ] frontmatter 가 [reference/frontmatter](apps/docs/pages/reference/frontmatter.mdx) 와 1:1 일치
-- [ ] 사이트의 모든 외부 링크 클릭 가능 (`https://docs.lore-ai.vercel.app` 등)
+- [ ] 사이트의 모든 외부 링크 클릭 가능 (`https://lore-ai-docs.vercel.app` 등)
       → 아직 라이브 전이라 404 가 정상. publish 후 재확인 (Phase 5)
 - [ ] `pnpm publish --dry-run` 출력에 의도하지 않은 파일이 없음
 
@@ -275,7 +275,7 @@ Discussions 탭 → ⚙ → 기본 카테고리에 추가:
 각 프로젝트 → Settings → Domains:
 
 - `lore-ai-web` → `lore-ai.vercel.app` 추가 (기본 alias 면 자동)
-- `lore-ai-docs` → `docs.lore-ai.vercel.app` (또는 `lore-ai-docs.vercel.app`)
+- `lore-ai-docs` → `lore-ai-docs.vercel.app`
 
 ### 3.4 배포 검증
 
@@ -283,10 +283,10 @@ Discussions 탭 → ⚙ → 기본 카테고리에 추가:
 curl -I https://lore-ai.vercel.app
 # HTTP/2 200
 
-curl -I https://docs.lore-ai.vercel.app/getting-started/quickstart
+curl -I https://lore-ai-docs.vercel.app/getting-started/quickstart
 # HTTP/2 200
 
-curl -I https://docs.lore-ai.vercel.app/cli/sync
+curl -I https://lore-ai-docs.vercel.app/cli/sync
 # HTTP/2 200
 ```
 
@@ -295,7 +295,7 @@ curl -I https://docs.lore-ai.vercel.app/cli/sync
 - 다크/라이트 토글
 - "npm i -g lore-ai" 복사 버튼
 - 도큐 사이드바 / 검색 / 모든 카테고리 라우트
-- README 의 외부 링크 (`docs.lore-ai.vercel.app`, `github.com/terracelab/lore-ai`) 클릭 가능
+- README 의 외부 링크 (`lore-ai-docs.vercel.app`, `github.com/terracelab/lore-ai`) 클릭 가능
 
 ---
 
@@ -393,7 +393,7 @@ GitHub Discussions → **📣 Show and tell** → 새 토론:
 추출해 AI 에디터가 도메인 맥락을 이해하게 만드는 CLI 입니다.
 
 - npm i -g lore-ai
-- 5분 Quickstart: https://docs.lore-ai.vercel.app/getting-started/quickstart
+- 5분 Quickstart: https://lore-ai-docs.vercel.app/getting-started/quickstart
 - GitHub: https://github.com/terracelab/lore-ai
 
 설계 배경 / 3-Layer 구조 / 데이터 아카이올로지 의 의미는 위 docs 에…

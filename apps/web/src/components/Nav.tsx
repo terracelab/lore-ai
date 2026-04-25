@@ -17,7 +17,7 @@ export function Nav() {
           <span>lore-ai</span>
         </Link>
         <div className="flex items-center gap-6 text-sm">
-          <a href="https://docs.lore-ai.vercel.app" className="text-muted hover:text-fg">
+          <a href="https://lore-ai-docs.vercel.app" className="text-muted hover:text-fg">
             Docs
           </a>
           <a href="https://github.com/terracelab/lore-ai" className="text-muted hover:text-fg">

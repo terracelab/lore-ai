@@ -10,7 +10,7 @@ export function Footer() {
           . MIT licensed.
         </div>
         <div className="flex gap-5">
-          <a href="https://docs.lore-ai.vercel.app" className="hover:text-fg">
+          <a href="https://lore-ai-docs.vercel.app" className="hover:text-fg">
             Docs
           </a>
           <a href="https://github.com/terracelab/lore-ai" className="hover:text-fg">

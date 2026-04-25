@@ -7,4 +7,4 @@
 - `lore.config.yaml` — 두 프로젝트를 한 config 로 관리
 - `.lore/flows/` — `lore sync` 결과
 
-PR 환영. [contributing/setup](https://docs.lore-ai.vercel.app/contributing/setup) 참고.
+PR 환영. [contributing/setup](https://lore-ai-docs.vercel.app/contributing/setup) 참고.

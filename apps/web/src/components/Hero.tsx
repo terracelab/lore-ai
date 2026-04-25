@@ -38,7 +38,7 @@ export function Hero() {
 
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <a
-            href="https://docs.lore-ai.vercel.app/getting-started/quickstart"
+            href="https://lore-ai-docs.vercel.app/getting-started/quickstart"
             className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-white shadow hover:opacity-90"
           >
             Quickstart →
