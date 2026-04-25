@@ -1,5 +1,17 @@
 # lore-ai
 
+## 0.4.0
+
+### Minor Changes
+
+- [#14](https://github.com/terracelab/lore-ai/pull/14) [`bdbfae8`](https://github.com/terracelab/lore-ai/commit/bdbfae8aca557906661d72aaa8f0aab9732fa4c5) Thanks [@kyong-dev](https://github.com/kyong-dev)! - `lore synthesize` 의 출력물을 평면 산문에서 8섹션 구조 (구성 파일·데이터 모델·엔드포인트·대표 플로우·권한 패턴·클라이언트 상태·정책·파일 인덱스) 로 강제. 표·ASCII ER 다이어그램·번호 단계 사용을 의무화하고 `⚠️` 마커로 정책 검토 필요 항목을 명시 분리. `--since <range>` 가 실제로 동작하도록 wiring — 카테고리 어노테이션이 위치한 디렉토리의 git log 를 자동 탐지된 git 루트에서 수집해 프롬프트에 함께 번들. 어노테이션 태그가 없어도 LLM 이 엔드포인트↔화면, 모델↔FK, task↔트리거, 컴포넌트↔hook↔API 같은 연결을 코드 단서로 추론하도록 지시 추가.
+
+### Patch Changes
+
+- Updated dependencies [[`bdbfae8`](https://github.com/terracelab/lore-ai/commit/bdbfae8aca557906661d72aaa8f0aab9732fa4c5)]:
+  - @lore-ai-automation/core@0.4.0
+  - @lore-ai-automation/parser@0.4.0
+
 ## 0.3.1
 
 ### Patch Changes
