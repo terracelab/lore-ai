@@ -35,8 +35,8 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@lore-ai/core": "workspace:*",
-    "@lore-ai/parser": "workspace:*",
+    "@lore-ai-automation/core": "workspace:*",
+    "@lore-ai-automation/parser": "workspace:*",
     "commander": "^12.1.0",
     "fast-glob": "^3.3.2",
     "kleur": "^4.1.5",

@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 import fastGlob from 'fast-glob';
-import { loadConfig, parseFile, checkAnnotations, formatIssues } from '@lore-ai/core';
-import type { Annotation, Language } from '@lore-ai/core';
+import { loadConfig, parseFile, checkAnnotations, formatIssues } from '@lore-ai-automation/core';
+import type { Annotation, Language } from '@lore-ai-automation/core';
 import { log } from '../util/log.js';
 
 interface CheckOptions {

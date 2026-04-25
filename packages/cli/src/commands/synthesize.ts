@@ -6,8 +6,8 @@ import {
   extractAll,
   groupByCategory,
   buildSynthesizePrompt,
-} from '@lore-ai/core';
-import type { Annotation, ProjectConfig } from '@lore-ai/core';
+} from '@lore-ai-automation/core';
+import type { Annotation, ProjectConfig } from '@lore-ai-automation/core';
 import { log } from '../util/log.js';
 
 interface SynthesizeOptions {

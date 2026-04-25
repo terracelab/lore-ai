@@ -8,8 +8,8 @@ import {
   renderFlow,
   renderIndex,
   renderL3,
-} from '@lore-ai/core';
-import type { Annotation, FlowMeta, ProjectConfig } from '@lore-ai/core';
+} from '@lore-ai-automation/core';
+import type { Annotation, FlowMeta, ProjectConfig } from '@lore-ai-automation/core';
 import { log } from '../util/log.js';
 
 interface SyncOptions {

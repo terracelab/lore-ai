@@ -90,8 +90,8 @@ GitHub Token 은 자동 (`secrets.GITHUB_TOKEN`).
 
 ```bash
 npm view lore-ai
-npm view @lore-ai/core
-npm view @lore-ai/parser
+npm view @lore-ai-automation/core
+npm view @lore-ai-automation/parser
 ```
 
 세 명령 모두 `404` 가 떠야 합니다. 누군가 이미 가져갔다면 `OSS_RELEASE_PLAN.md §10` 의 대안 이름 후보를 재검토.
@@ -177,7 +177,7 @@ corepack enable && pnpm install --frozen-lockfile
 ### 7.3 npm publish 가 401
 
 - `NPM_TOKEN` 이 *Automation* 타입인지 (Publish 타입은 OTP 요구)
-- 토큰의 scope 가 `lore-ai`, `@lore-ai/*` 를 포함하는지
+- 토큰의 scope 가 `lore-ai`, `@lore-ai-automation/*` 를 포함하는지
 
 ### 7.4 Pagefind 검색 빈 결과
 

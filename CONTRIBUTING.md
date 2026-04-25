@@ -47,7 +47,7 @@ pnpm build
 pnpm test
 
 # 단일 패키지만
-pnpm --filter @lore-ai/core test
+pnpm --filter @lore-ai-automation/core test
 
 # 개발 서버 (사이트)
 pnpm --filter web dev        # 랜딩 localhost:3000
@@ -102,7 +102,7 @@ pnpm changeset
 **patch 예시**:
 ```
 ---
-'@lore-ai/core': patch
+'@lore-ai-automation/core': patch
 ---
 
 Fix @History block parsing when date contains hyphens.
@@ -145,7 +145,7 @@ Fix @History block parsing when date contains hyphens.
 ## 디버깅 팁
 
 - CLI 실행: `pnpm --filter lore-ai dev -- init` (커맨드 인자는 `--` 뒤에)
-- 단일 테스트 파일: `pnpm --filter @lore-ai/core test -- src/parser.test.ts`
+- 단일 테스트 파일: `pnpm --filter @lore-ai-automation/core test -- src/parser.test.ts`
 - Turbo 캐시 무효화: `pnpm turbo run build --force`
 - pnpm 잠금 재생성: `rm pnpm-lock.yaml && pnpm install` (가능한 피할 것)
 

@@ -1,4 +1,4 @@
-# @lore-ai/parser
+# @lore-ai-automation/parser
 
 > Substantive-file detection for Lore AI. Filters out import-only / type-only / boilerplate files before running annotation checks.
 

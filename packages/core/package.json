@@ -1,5 +1,5 @@
 {
-  "name": "@lore-ai/core",
+  "name": "@lore-ai-automation/core",
   "version": "0.0.0",
   "description": "Core engine for Lore AI: annotation parser, config loader, markdown synthesizer, checker.",
   "license": "MIT",

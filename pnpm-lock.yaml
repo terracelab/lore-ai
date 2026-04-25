@@ -115,10 +115,10 @@ importers:
 
   packages/cli:
     dependencies:
-      '@lore-ai/core':
+      '@lore-ai-automation/core':
         specifier: workspace:*
         version: link:../core
-      '@lore-ai/parser':
+      '@lore-ai-automation/parser':
         specifier: workspace:*
         version: link:../parser
       commander:
@@ -174,7 +174,7 @@ importers:
 
   packages/parser:
     dependencies:
-      '@lore-ai/core':
+      '@lore-ai-automation/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

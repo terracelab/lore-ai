@@ -5,7 +5,7 @@
     { "repo": "terracelab/lore-ai" }
   ],
   "commit": false,
-  "fixed": [["@lore-ai/core", "@lore-ai/parser", "lore-ai"]],
+  "fixed": [["@lore-ai-automation/core", "@lore-ai-automation/parser", "lore-ai"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",

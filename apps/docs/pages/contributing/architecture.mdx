@@ -8,14 +8,14 @@ title: 내부 아키텍처
 
 ```
        ┌──────────────┐
-       │ @lore-ai/    │
+       │ @lore-ai-automation/    │
        │   parser     │ ──── (workspace) ────┐
        └─────┬────────┘                      │
              │                               │
              │ depends                       │
              ▼                               │
        ┌──────────────┐                      │
-       │ @lore-ai/    │                      │
+       │ @lore-ai-automation/    │                      │
        │   core       │ ◀────────────────────┤
        └─────┬────────┘                      │
              │                               │
@@ -25,8 +25,8 @@ title: 내부 아키텍처
        └───────────────┘
 ```
 
-- **`@lore-ai/core`** — 순수 TS, 의존성 최소 (zod + yaml). side effect 없음.
-- **`@lore-ai/parser`** — substantive-file 검출. v0 는 regex, v1 에서 tree-sitter.
+- **`@lore-ai-automation/core`** — 순수 TS, 의존성 최소 (zod + yaml). side effect 없음.
+- **`@lore-ai-automation/parser`** — substantive-file 검출. v0 는 regex, v1 에서 tree-sitter.
 - **`lore-ai`** (CLI) — `commander` 라우팅 + 위 두 패키지 호출.
 
 ## 데이터 플로우
@@ -38,7 +38,7 @@ source files (.py, .ts, .tsx)
         ▼
 files: string[]
         │
-        │  @lore-ai/core/extractor
+        │  @lore-ai-automation/core/extractor
         ▼
 Annotation[]
         │

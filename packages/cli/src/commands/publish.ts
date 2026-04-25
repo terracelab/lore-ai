@@ -1,6 +1,6 @@
 import { cp, mkdir, readdir, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
-import { loadConfig } from '@lore-ai/core';
+import { loadConfig } from '@lore-ai-automation/core';
 import { log } from '../util/log.js';
 
 interface PublishOptions {

@@ -5,7 +5,7 @@ import {
   gatherWorkspaceEvidence,
   buildBootstrapPrompt,
   buildHeuristicDraft,
-} from '@lore-ai/core';
+} from '@lore-ai-automation/core';
 import { log } from '../util/log.js';
 
 interface BootstrapOptions {
