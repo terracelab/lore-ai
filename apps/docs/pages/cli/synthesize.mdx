@@ -2,26 +2,38 @@
 title: lore synthesize
 ---
 
-# `lore synthesize <category>`
+# `lore synthesize [category]`
 
-LLM 으로 단일 L2 flow 파일을 재구성하기 위한 **프롬프트를 빌드** 합니다.
+LLM 으로 L2 flow 파일을 재구성하기 위한 **프롬프트를 빌드** 합니다. 카테고리 인자를 생략하면 모든 카테고리를 한 프롬프트에 묶어 출력합니다.
 
 ```bash
-lore synthesize signal           # 프롬프트를 stdout 으로 출력
-lore synthesize signal --apply   # (v0.2) Anthropic API 호출 + 파일 덮어쓰기
+lore synthesize                  # 모든 카테고리를 한 번에 — 가장 흔한 사용법
+lore synthesize signal           # 단일 카테고리만
+lore synthesize --apply          # (v0.2) Anthropic API 호출 + 파일 덮어쓰기
 lore synthesize signal --since 2.weeks   # 최근 2주 변경분만 반영
 ```
 
 ## 동작
+
+### 단일 카테고리 모드 (`lore synthesize <category>`)
 
 1. `lore.config.yaml` 의 `domains[<category>]` 검증
 2. 모든 프로젝트에서 해당 카테고리 어노테이션 추출
 3. 기존 `.lore/flows/<category>.md` 본문 (있으면) 로드
 4. L1 + L2 + L3 를 합쳐 [synthesize 프롬프트](https://github.com/terracelab/lore-ai/blob/main/packages/core/src/prompts.ts) 생성
 
+### 전체 모드 (`lore synthesize`, 인자 없음)
+
+1. `domains:` 의 모든 카테고리를 순회
+2. 각 카테고리의 어노테이션 + 기존 본문 수집
+3. 어노테이션이 0 인 카테고리는 자동으로 건너뜀 (목록은 stderr 에 표시)
+4. 모든 카테고리 컨텍스트를 **하나의 프롬프트**로 묶음
+5. 출력 규약에 따라 LLM 이 카테고리별로 `=== FILE: .lore/flows/<slug>.md ===` 마커로 응답하도록 지시
+
 ## 출력 규약
 
-- 프롬프트는 H1 1개 + H2 다수의 마크다운을 요구
+- 단일 모드: H1 1개 + H2 다수의 마크다운 한 덩어리
+- 전체 모드: 카테고리당 한 블록, `=== FILE: ... ===` / `=== END FILE ===` 마커로 구분
 - frontmatter 는 LLM 이 만들지 않음 (CLI 가 prepend)
 - H2 ≥ 20자 본문 (RAG 청크 최소 길이)
 
@@ -30,8 +42,10 @@ lore synthesize signal --since 2.weeks   # 최근 2주 변경분만 반영
 `--apply` 가 v0.2 까지 미구현이므로:
 
 ```bash
-lore synthesize signal | pbcopy   # macOS 의 경우
-# Claude Code 에 붙여넣기 → 응답을 .lore/flows/signal.md 본문에 (frontmatter 제외) 저장
+lore synthesize | pbcopy   # macOS — 모든 카테고리를 한 번에
+# Claude Code 에 붙여넣기 →
+#   Claude Code 가 .lore/flows/<cat>.md 파일들을 직접 수정
+# 또는 일반 챗 LLM 이면 응답을 FILE 마커로 분리해 각 파일에 저장
 ```
 
 이후 `lore sync` 를 한 번 더 실행해 frontmatter 를 갱신합니다.

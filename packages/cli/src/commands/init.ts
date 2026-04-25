@@ -101,7 +101,8 @@ lore sync       ← .lore/flows/<카테고리>.md 생성
 | \`lore check\` | 모든 configured projects 전체 검증 |
 | \`lore check <files…>\` | 명시 파일만 검증 (precommit 용) |
 | \`lore sync\` | L2 / L3 마크다운 재생성 |
-| \`lore synthesize <카테고리>\` | LLM 으로 L2 flow 재구성 (프롬프트 출력) |
+| \`lore synthesize\` | 모든 카테고리를 한 프롬프트로 출력 (전체 모드) |
+| \`lore synthesize <카테고리>\` | 단일 L2 flow 재구성 프롬프트 |
 | \`lore publish\` | Lore Board 에 동기화 |
 | \`lore chat\` | 로컬 RAG REPL (v0.2 예정) |
 
