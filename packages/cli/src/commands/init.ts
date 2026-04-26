@@ -56,6 +56,13 @@ llm:
   model: claude-opus-4-7
   apiKeyEnv: ANTHROPIC_API_KEY
   temperature: 0.3
+
+# publish:                                          # (선택) Lore Board 동기화 설정 — \`lore publish\` 가 사용
+#   target: ~/dev/projects/onboarding/lore-board    # Lore Board 저장소의 로컬 경로 (또는 v1 에서는 git URL)
+#   project: my-project                             # Lore Board 안에서의 프로젝트 슬러그 — content/projects/<project>/flows/ 로 publish
+#   mode: direct                                    # direct = 단순 cp / pr = 자동 PR (v0.x 미구현, 사용자가 수동 commit·push)
+#   branch: main                                    # publish target 의 브랜치
+#   prefix: 'chore(docs): sync'                     # 수동 commit 메시지 prefix
 `;
 
 const SEED_DOMAIN_MAP = `# 도메인 맵 (L1)
