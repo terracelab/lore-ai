@@ -1,5 +1,12 @@
 # @lore-ai-automation/parser
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`6da9dc2`](https://github.com/terracelab/lore-ai/commit/6da9dc2bd2971e780516f789784df1528260cac8)]:
+  - @lore-ai-automation/core@0.5.1
+
 ## 0.5.0
 
 ### Patch Changes
