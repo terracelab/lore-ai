@@ -103,8 +103,12 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
 
   log.success(`Found ${allAnnotations.length} annotation(s)`);
 
+  const draftDir = resolve(cwd, config.flows.draftDir);
   const flowsDir = resolve(cwd, config.flows.dir);
-  if (!options.dryRun) await mkdir(flowsDir, { recursive: true });
+  if (!options.dryRun) {
+    await mkdir(draftDir, { recursive: true });
+    await mkdir(flowsDir, { recursive: true });
+  }
 
   const groups = groupByCategory(allAnnotations);
   const indexEntries: Array<{ slug: string; icon: string; title: string }> = [];
@@ -124,7 +128,11 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
     indexEntries.push({ slug, icon: meta.icon, title: meta.title });
 
     const body = [
-      `# ${meta.icon} ${meta.title}`,
+      `# ${meta.icon} ${meta.title} (Draft — raw L3 facts)`,
+      '',
+      `> 이 파일은 \`lore sync\` 가 코드 어노테이션에서 자동 생성한 **원천 사실** 입니다.`,
+      `> 사람이 읽는 보고서는 \`lore synthesize\` 가 \`${config.flows.dir}/${slug}.md\` 로 만들어냅니다.`,
+      `> 이 draft 를 직접 편집하지 마세요 — 다음 \`lore sync\` 가 덮어씁니다.`,
       '',
       `## 1. 개요`,
       '',
@@ -136,7 +144,7 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
     ].join('\n');
 
     const out = renderFlow(meta, body);
-    const path = resolve(flowsDir, `${slug}.md`);
+    const path = resolve(draftDir, `${slug}.md`);
     if (options.dryRun) {
       log.info(`[dry-run] would write ${path} (${out.length} bytes)`);
     } else {
@@ -145,7 +153,7 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
     }
   }
 
-  // Auto-generate INDEX.md
+  // Auto-generate INDEX.md (lives in flowsDir — it's category nav, not a synthesis target)
   const projectName = projectKeys[0] ?? 'project';
   const indexBody = renderIndex(projectName, indexEntries);
   const indexPath = resolve(flowsDir, config.flows.indexFile);

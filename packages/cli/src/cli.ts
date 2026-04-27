@@ -43,16 +43,17 @@ export function buildProgram(): Command {
 
   program
     .command('sync')
-    .description('Scan the workspace and regenerate .lore/flows/*.md (L2 + L3)')
+    .description('Scan the workspace and regenerate .lore/draft/*.md (raw L3 facts)')
     .option('--project <name>', 'limit to a single project key from lore.config.yaml')
     .option('--dry-run', 'print planned writes without touching disk')
     .action(syncCommand);
 
   program
     .command('synthesize [category]')
-    .description('Build an LLM prompt to refresh L2 flow(s) — omit category for all-in-one')
+    .description('Refresh changed L2 flow(s) — skips categories whose drafts are unchanged')
     .option('--apply', 'call the LLM API directly and overwrite the flow file')
     .option('--since <range>', 'limit to commits in this range (e.g. 2.weeks)')
+    .option('--force', 'ignore the synth cache and re-synthesize all categories')
     .action(synthesizeCommand);
 
   program

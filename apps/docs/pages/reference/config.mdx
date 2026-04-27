@@ -27,8 +27,10 @@ domains: # L1 토큰
     subdomains: [profile, session]
 
 flows:
-  dir: ./.lore/flows # L2 출력 디렉토리
-  indexFile: INDEX.md # 자동 생성 인덱스 파일명
+  dir: ./.lore/flows # synthesize 가 만드는 사람용 L2 보고서 (publish · chat 가 읽는 곳)
+  draftDir: ./.lore/draft # sync 가 만드는 원천 L3 사실 — synthesize 의 입력
+  cacheDir: ./.lore/.synth-cache # 카테고리별 해시 매니페스트 (변경된 카테고리만 재합성)
+  indexFile: INDEX.md # 자동 생성 인덱스 파일명 (flows 디렉토리에 위치)
 
 extract:
   requireDomain: true

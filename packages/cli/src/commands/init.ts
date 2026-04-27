@@ -42,7 +42,9 @@ domains: {}
   #   subdomains: [profile, session]
 
 flows:
-  dir: ./.lore/flows
+  dir: ./.lore/flows # synthesize 가 만드는 사람용 보고서 (publish · chat 가 읽는 곳)
+  draftDir: ./.lore/draft # sync 가 만드는 원천 L3 사실 (synthesize 의 입력)
+  cacheDir: ./.lore/.synth-cache # 카테고리별 해시 매니페스트 — 변경된 카테고리만 다시 synthesize
   indexFile: INDEX.md
 
 extract:

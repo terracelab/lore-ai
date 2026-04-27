@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { resolve, relative, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import fastGlob from 'fast-glob';
@@ -8,6 +9,9 @@ import {
   groupByCategory,
   buildSynthesizePrompt,
   buildSynthesizeAllPrompt,
+  canonicalAnnotationHash,
+  readSynthCache,
+  writeSynthCache,
 } from '@lore-ai-automation/core';
 import type {
   Annotation,
@@ -19,6 +23,7 @@ import { log } from '../util/log.js';
 interface SynthesizeOptions {
   apply?: boolean;
   since?: string;
+  force?: boolean;
 }
 
 async function gatherFilesFor(project: ProjectConfig, cwd: string): Promise<string[]> {
@@ -107,12 +112,35 @@ function gatherGitLog(cwd: string, annotations: Annotation[], since: string): st
   return out.join('\n').trim();
 }
 
+interface ChangeDecision {
+  changed: boolean;
+  hash: string;
+  reason: 'no-cache' | 'hash-mismatch' | 'flow-missing' | 'unchanged' | 'forced';
+}
+
+function decideChange(
+  annotations: Annotation[],
+  cached: { draftHash: string } | undefined,
+  flowFileExists: boolean,
+  force: boolean,
+): ChangeDecision {
+  const hash = canonicalAnnotationHash(annotations);
+  if (force) return { changed: true, hash, reason: 'forced' };
+  if (!cached) return { changed: true, hash, reason: 'no-cache' };
+  if (cached.draftHash !== hash) return { changed: true, hash, reason: 'hash-mismatch' };
+  if (!flowFileExists) return { changed: true, hash, reason: 'flow-missing' };
+  return { changed: false, hash, reason: 'unchanged' };
+}
+
 export async function synthesizeCommand(
   category: string | undefined,
   options: SynthesizeOptions,
 ): Promise<void> {
   const cwd = process.cwd();
   const { config } = await loadConfig(cwd);
+
+  const flowsDir = resolve(cwd, config.flows.dir);
+  const cacheDir = resolve(cwd, config.flows.cacheDir);
 
   const all = await gatherAllAnnotations(cwd, config.projects);
   const grouped = groupByCategory(all);
@@ -128,7 +156,18 @@ export async function synthesizeCommand(
       log.warn(`No annotations found for category "${category}".`);
       return;
     }
-    const flowPath = resolve(cwd, config.flows.dir, `${category}.md`);
+    const flowPath = resolve(flowsDir, `${category}.md`);
+    const cached = await readSynthCache(cacheDir, category);
+    const decision = decideChange(annotations, cached, existsSync(flowPath), !!options.force);
+
+    if (!decision.changed) {
+      log.success(
+        `[${category}] unchanged since last synthesize — skipping (hash ${decision.hash.slice(7, 19)}…)`,
+      );
+      log.hint('Use --force to re-synthesize anyway.');
+      return;
+    }
+
     const existingBody = await readExistingFlow(cwd, config.flows.dir, category);
     const recentDiff = options.since ? gatherGitLog(cwd, annotations, options.since) : undefined;
     const prompt = buildSynthesizePrompt({
@@ -142,12 +181,25 @@ export async function synthesizeCommand(
     if (!options.apply) {
       process.stdout.write(prompt + '\n');
       log.divider();
+      log.info(
+        `[${category}] reason: ${decision.reason} — emitting prompt (hash ${decision.hash.slice(7, 19)}…)`,
+      );
       if (recentDiff) {
         log.info(`Bundled git log since ${options.since}.`);
       }
       log.hint('Copy the prompt above into Claude Code, paste the response back into');
       log.hint(`  ${flowPath}`);
       log.hint('or run again with --apply once API support lands.');
+
+      // Optimistic cache update — assumes the user/LLM will write the flow file.
+      // The skip check also gates on `flowFileExists`, so a missed paste-back
+      // self-corrects on the next run.
+      await writeSynthCache(cacheDir, category, {
+        slug: category,
+        draftHash: decision.hash,
+        annotationCount: annotations.length,
+        lastSynthesizedAt: new Date().toISOString(),
+      });
       return;
     }
 
@@ -160,17 +212,36 @@ export async function synthesizeCommand(
 
   const categories: SynthesizeAllCategoryInput[] = [];
   const skipped: string[] = [];
+  const unchanged: string[] = [];
+  const includedDecisions = new Map<string, ChangeDecision>();
+
   for (const slug of Object.keys(config.domains)) {
     const annotations = grouped.get(slug) ?? [];
     if (annotations.length === 0) {
       skipped.push(slug);
       continue;
     }
+    const flowPath = resolve(flowsDir, `${slug}.md`);
+    const cached = await readSynthCache(cacheDir, slug);
+    const decision = decideChange(annotations, cached, existsSync(flowPath), !!options.force);
+    if (!decision.changed) {
+      unchanged.push(slug);
+      continue;
+    }
     const existingBody = await readExistingFlow(cwd, config.flows.dir, slug);
     categories.push({ category: slug, annotations, existingBody });
+    includedDecisions.set(slug, decision);
   }
 
   if (categories.length === 0) {
+    if (unchanged.length > 0) {
+      log.success(
+        `All ${unchanged.length} categor${unchanged.length === 1 ? 'y is' : 'ies are'} unchanged since last synthesize — nothing to do.`,
+      );
+      log.hint(`Unchanged: ${unchanged.join(', ')}`);
+      log.hint('Use --force to re-synthesize anyway.');
+      return;
+    }
     log.warn('No categories have any annotations yet — run `lore sync` after annotating code.');
     return;
   }
@@ -191,19 +262,35 @@ export async function synthesizeCommand(
     process.stdout.write(prompt + '\n');
     log.divider();
     log.info(
-      `Built one prompt covering ${categories.length} categor${categories.length === 1 ? 'y' : 'ies'}.`,
+      `Built one prompt covering ${categories.length} changed categor${categories.length === 1 ? 'y' : 'ies'}.`,
     );
+    if (unchanged.length > 0) {
+      log.info(`Unchanged (skipped): ${unchanged.join(', ')}`);
+    }
     if (recentDiff) {
       log.hint(`Bundled git log since ${options.since}.`);
     }
     if (skipped.length) {
-      log.hint(`Skipped (no annotations): ${skipped.join(', ')}`);
+      log.hint(`No annotations: ${skipped.join(', ')}`);
     }
     log.hint('Paste into Claude Code — it can write each .lore/flows/<cat>.md directly.');
     log.hint(
       `Or paste into a chat LLM and split by '=== FILE: ${join(config.flows.dir, '<cat>.md')} ===' markers.`,
     );
     log.hint('Run again with --apply once API support lands.');
+
+    // Optimistic per-category cache update for every category included in the prompt.
+    const now = new Date().toISOString();
+    for (const c of categories) {
+      const decision = includedDecisions.get(c.category);
+      if (!decision) continue;
+      await writeSynthCache(cacheDir, c.category, {
+        slug: c.category,
+        draftHash: decision.hash,
+        annotationCount: c.annotations.length,
+        lastSynthesizedAt: now,
+      });
+    }
     return;
   }
 
