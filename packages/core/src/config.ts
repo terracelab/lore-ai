@@ -55,6 +55,8 @@ export const loreConfigSchema = z.object({
   flows: z
     .object({
       dir: z.string().default('./.lore/flows'),
+      draftDir: z.string().default('./.lore/draft'),
+      cacheDir: z.string().default('./.lore/.synth-cache'),
       indexFile: z.string().default('INDEX.md'),
     })
     .default({}),

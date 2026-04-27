@@ -6,5 +6,6 @@ export * from './markdown.js';
 export * from './extractor.js';
 export * from './prompts.js';
 export * from './bootstrap.js';
+export * from './synthCache.js';
 
 export const VERSION = '0.0.0';
