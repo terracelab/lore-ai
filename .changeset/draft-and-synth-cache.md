@@ -16,7 +16,7 @@
 **3. 보고서 포맷 프롬프트** — `synthesize` 가 만들어내는 문서가 평면 산문에서 **시각 보고서** 로 바뀐다:
 
 - 상단 📊 한눈에 보기 메트릭 카드 (파일 수 · 엔드포인트 · 모델 · 🟡/🔴 정책 카운트 · 최근 변경일)
-- §2 ER 다이어그램 / §4 대표 플로우는 **Mermaid (\`erDiagram\` · \`flowchart\`) 우선**, ASCII 폴백
+- §2 ER 다이어그램 / §4 대표 플로우는 **Mermaid (`erDiagram` · `flowchart`) 우선**, ASCII 폴백
 - §3 엔드포인트 표에 권한 배지 컬럼 (🔓 public · 🔒 auth · 🛡️ admin · 💳 paid · 🤖 internal)
 - §7 정책은 분류 (🟢 확정 · 🟡 확인 필요 · 🔴 TBD) + 위험도 (🔥 / 🟧 / 🟩) 통합 표
 - §8 변경 이력 각 행에 변경 분류 배지 (🆕 / 🔄 / 🗑 / 🔐 / 💳 / 📜 / 🐛)
@@ -24,12 +24,12 @@
 
 **4. 설정 신규 필드** (모두 기본값 있음, 기존 사용자 무중단):
 
-\`\`\`yaml
+```text
 flows:
-  dir: ./.lore/flows           # synthesize 출력 (사람용 보고서)
-  draftDir: ./.lore/draft      # sync 출력 (원천 L3)
-  cacheDir: ./.lore/.synth-cache  # 카테고리별 해시 매니페스트
+  dir: ./.lore/flows                # synthesize 출력 (사람용 보고서)
+  draftDir: ./.lore/draft           # sync 출력 (원천 L3)
+  cacheDir: ./.lore/.synth-cache    # 카테고리별 해시 매니페스트
   indexFile: INDEX.md
-\`\`\`
+```
 
 **Migration**: 기존 `.lore/flows/*.md` 는 그대로 두고, 다음 `lore sync` 가 새로 `.lore/draft/` 를 채운다. 첫 `lore synthesize` 는 캐시가 비어있으므로 모든 카테고리를 한 번 재합성하고, 이후부터는 변경된 카테고리만 다룬다.
