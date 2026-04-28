@@ -4,7 +4,8 @@
 
 ### Patch Changes
 
-- Updated dependencies [[`df4f941`](https://github.com/terracelab/lore-ai/commit/df4f9415a3c6f4afee66aad1cac2e3447286bef2)]:
+- Updated dependencies
+- Updated dependencies [df4f941]
   - @lore-ai-automation/core@0.6.0
 
 ## 0.5.1
