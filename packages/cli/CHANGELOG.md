@@ -1,5 +1,70 @@
 # lore-ai
 
+## 0.6.0
+
+### Minor Changes
+
+- L2 보고서 깊이 강화 + `lore review` 보강 패스 추가.
+
+  **1. L2_DOCTRINE 깊이 규칙 (D1–D6)** — `synthesize` 가 만들어내는 보고서가 표·다이어그램 골격은 잡혀있으나 사람이 읽기엔 얕다는 피드백을 반영. 다음을 의무화:
+  - **D1 핵심 코드 인라인 발췌** — §2 (모델) · §3 (엔드포인트) · §5 (권한·데코레이터) 의 정책 결정 코드는 5–15줄 코드 펜스 + ⭐ 한 줄 해설.
+  - **D2 하위 섹션 깊이** — 영역 3개 이상이면 `### 2.1`, `### 4.1` ... 분리 (한 H2 에 다 욱여넣지 말 것).
+  - **D3 기본값 / Magic 값 forensics** — `password=None` default, `CORS_ALLOW_ALL_ORIGINS=True`, 긴 토큰 TTL, `localhost` 하드코딩, 미구현 enum, `csrf_exempt` 우회, 명명 mismatch, webhook 서명 누락 등 9개 패턴은 §7 정책 표에 자동 행 + 위험도 배지로 추가.
+  - **WHY 의무 (§7)** — 모든 🟡 / 🔴 행은 사유 한 줄 (업계 비교 · 실패 영향 · 의존성) 필수. 단순 ⚠️ + 사실만 적힌 행은 잘못된 보고서.
+  - **D4 TBD 사유 명시** · **D5 사이드카 docs cross-link** · **D6 cross-cutting 카테고리(`api_infra`, `client_state` 등)는 수직 레이어 다이어그램 1개**.
+
+  §0 메트릭 카드에 `🧩 코드 발췌` 카운트 컬럼 추가.
+
+  **2. `lore review <category>` — 깊이 보강 2차 패스** — `synthesize` 결과물을 D1–D6 기준으로 감사하고, 소스 파일을 직접 읽어 누락된 코드 발췌·WHY 사유·forensics 행을 채우는 별도 명령. Claude Code 같은 파일 편집 도구가 있는 에이전트에서 돌리면 `.lore/flows/<category>.md` 를 직접 보강하고, 일반 LLM 에서는 review report markdown 을 반환한다. 9개 검사 항목 (C1~C9) 으로 통과·보강 필요 항목을 분리.
+
+  ```bash
+  lore sync                    # 코드 → L3 draft
+  lore synthesize <cat>        # L3 → L2 보고서 (D1–D6 적용)
+  lore review <cat>            # 보고서 깊이 보강 (코드 발췌·WHY·forensics)
+  ```
+
+  신규 export: `buildReviewPrompt`, `ReviewInput` (from `@lore-ai-automation/core`).
+
+  **3. `INDEX.md` 강화** — `renderIndex` 가 frontmatter `summary` + "Frontmatter 스펙 / 레이어 개념 (L1·L2·L3) / 갱신 방법" 섹션을 포함해 대시보드의 카테고리 진입점으로 단독 사용 가능.
+
+  **Migration**: 호환성 유지. 기존 `synthesize` 캐시는 그대로 사용되며, 강화된 doctrine 은 다음 `synthesize`(또는 `--force`) 부터 적용된다. `lore review` 는 `synthesize` 후 선택적으로 돌리면 된다.
+
+- df4f941: `sync` / `synthesize` 파이프라인 분리 + 변경 감지 + 보고서 포맷 프롬프트.
+
+  **1. 폴더 분리** — 기존엔 `sync` 도 `synthesize` 도 같은 `.lore/flows/` 를 덮어써서, 코드 변경이 없어도 `synthesize` 를 돌릴 때마다 LLM 비용을 들여 전체 카테고리를 재작성하는 문제가 있었다. 이제:
+  - `sync` 는 `.lore/draft/<slug>.md` 에 **원천 L3 사실** 만 기록 (기계 생성, 매번 덮어쓰기 OK).
+  - `synthesize` 는 `.lore/flows/<slug>.md` 에 **사람이 읽는 L2 보고서** 를 만든다 (`publish` · `chat` 가 읽는 곳).
+  - `INDEX.md` 는 카테고리 메타만 담으므로 계속 `flows/` 에 위치.
+
+  **2. 변경 감지 캐시** — `synthesize` 는 카테고리별로 어노테이션 집합의 정규화된 sha256 해시를 계산해 `.lore/.synth-cache/<slug>.json` 과 비교한다. 해시가 같고 flow 파일이 존재하면 그 카테고리는 프롬프트에서 빼고 스킵한다 (LLM 호출 비용 절약). `--force` 플래그로 캐시 무시 가능. 캐시는 프롬프트 emit 시점에 낙관적으로 갱신되며, 사용자 / LLM 이 실제로 flow 파일을 쓰지 않으면 다음 실행에서 자동 회복 (`flowFileExists` 게이트).
+
+  **3. 보고서 포맷 프롬프트** — `synthesize` 가 만들어내는 문서가 평면 산문에서 **시각 보고서** 로 바뀐다:
+  - 상단 📊 한눈에 보기 메트릭 카드 (파일 수 · 엔드포인트 · 모델 · 🟡/🔴 정책 카운트 · 최근 변경일)
+  - §2 ER 다이어그램 / §4 대표 플로우는 **Mermaid (`erDiagram` · `flowchart`) 우선**, ASCII 폴백
+  - §3 엔드포인트 표에 권한 배지 컬럼 (🔓 public · 🔒 auth · 🛡️ admin · 💳 paid · 🤖 internal)
+  - §7 정책은 분류 (🟢 확정 · 🟡 확인 필요 · 🔴 TBD) + 위험도 (🔥 / 🟧 / 🟩) 통합 표
+  - §8 변경 이력 각 행에 변경 분류 배지 (🆕 / 🔄 / 🗑 / 🔐 / 💳 / 📜 / 🐛)
+  - 프롬프트가 명시적으로 "기존 본문이 이미 보고서 포맷이면 변경된 행 / 단계만 부분 갱신" 을 지시 — 변경 없는 섹션은 보존.
+
+  **4. 설정 신규 필드** (모두 기본값 있음, 기존 사용자 무중단):
+
+  ```text
+  flows:
+    dir: ./.lore/flows                # synthesize 출력 (사람용 보고서)
+    draftDir: ./.lore/draft           # sync 출력 (원천 L3)
+    cacheDir: ./.lore/.synth-cache    # 카테고리별 해시 매니페스트
+    indexFile: INDEX.md
+  ```
+
+  **Migration**: 기존 `.lore/flows/*.md` 는 그대로 두고, 다음 `lore sync` 가 새로 `.lore/draft/` 를 채운다. 첫 `lore synthesize` 는 캐시가 비어있으므로 모든 카테고리를 한 번 재합성하고, 이후부터는 변경된 카테고리만 다룬다.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [df4f941]
+  - @lore-ai-automation/core@0.6.0
+  - @lore-ai-automation/parser@0.6.0
+
 ## 0.5.1
 
 ### Patch Changes

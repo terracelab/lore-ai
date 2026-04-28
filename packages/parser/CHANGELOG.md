@@ -1,5 +1,13 @@
 # @lore-ai-automation/parser
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [df4f941]
+  - @lore-ai-automation/core@0.6.0
+
 ## 0.5.1
 
 ### Patch Changes

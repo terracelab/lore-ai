@@ -1,6 +1,6 @@
 {
   "name": "@lore-ai-automation/core",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Core engine for Lore AI: annotation parser, config loader, markdown synthesizer, checker.",
   "license": "MIT",
   "author": "Terracelab <oss@terracelab.co.kr>",
