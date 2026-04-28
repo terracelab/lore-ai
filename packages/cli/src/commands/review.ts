@@ -41,10 +41,7 @@ async function readFlow(cwd: string, flowsDir: string, category: string) {
   }
 }
 
-export async function reviewCommand(
-  category: string,
-  options: ReviewOptions,
-): Promise<void> {
+export async function reviewCommand(category: string, options: ReviewOptions): Promise<void> {
   const cwd = process.cwd();
   const { config } = await loadConfig(cwd);
 
@@ -68,9 +65,7 @@ export async function reviewCommand(
   const annotations = grouped.get(category) ?? [];
 
   if (annotations.length === 0) {
-    log.warn(
-      `No annotations found for "${category}" — review will rely on existing body alone.`,
-    );
+    log.warn(`No annotations found for "${category}" — review will rely on existing body alone.`);
   }
 
   const prompt = buildReviewPrompt({ category, annotations, config, existingBody });
