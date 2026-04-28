@@ -6,6 +6,7 @@ import { bootstrapCommand } from './commands/bootstrap.js';
 import { checkCommand } from './commands/check.js';
 import { syncCommand } from './commands/sync.js';
 import { synthesizeCommand } from './commands/synthesize.js';
+import { reviewCommand } from './commands/review.js';
 import { publishCommand } from './commands/publish.js';
 import { chatCommand } from './commands/chat.js';
 import { VERSION } from './index.js';
@@ -55,6 +56,14 @@ export function buildProgram(): Command {
     .option('--since <range>', 'limit to commits in this range (e.g. 2.weeks)')
     .option('--force', 'ignore the synth cache and re-synthesize all categories')
     .action(synthesizeCommand);
+
+  program
+    .command('review <category>')
+    .description(
+      'Audit an existing L2 flow against the depth doctrine and supplement gaps by reading source files',
+    )
+    .option('--apply', 'call the LLM API directly and rewrite the flow file (planned)')
+    .action(reviewCommand);
 
   program
     .command('publish')
