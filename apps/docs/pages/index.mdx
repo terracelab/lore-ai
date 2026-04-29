@@ -15,7 +15,9 @@ Lore AI 는 코드 옆에 적어두는 도메인 지식 (`@Domain`, `@BusinessLo
 npm i -g lore-ai
 cd my-project
 lore init
-lore sync
+lore sync             # 코드 → L3 raw facts (.lore/draft/)
+lore synthesize       # L3 → L2 9섹션 보고서 (.lore/flows/)
+lore review auth      # 보고서 깊이 보강 — 코드 발췌·WHY 사유·forensics
 ```
 
 ## 무엇이 다른가

@@ -1,19 +1,26 @@
 ---
 title: 첫 sync 결과 읽기
-description: lore sync 가 만든 .lore/flows 디렉토리 구조와 frontmatter 의미.
+description: lore sync 가 만든 .lore/draft 디렉토리 구조와 frontmatter 의미.
 ---
 
 # 첫 sync 결과 읽기
 
 ```text
 .lore/
-├── DOMAIN_MAP.md
-└── flows/
-    ├── INDEX.md         ← 자동 생성, 사이드바 노출 X
-    ├── auth.md          ← 카테고리 1 = 파일 1
-    ├── subscription.md
-    └── signal.md
+├── DOMAIN_MAP.md           ← L1 (사람 큐레이션)
+├── draft/                  ← L3 raw facts (lore sync)
+│   ├── auth.md             ← 카테고리 1 = 파일 1
+│   ├── subscription.md
+│   └── signal.md
+├── flows/                  ← L2 보고서 (lore synthesize)
+│   ├── INDEX.md            ← 자동 생성, 사이드바 노출 X
+│   ├── auth.md             ← 사람이 읽는 9섹션 보고서
+│   ├── subscription.md
+│   └── signal.md
+└── .synth-cache/           ← synthesize 변경 감지용 해시
 ```
+
+`lore sync` 는 `.lore/draft/` 만 채웁니다. 그 다음 `lore synthesize` 를 돌려야 사람이 읽는 `.lore/flows/<cat>.md` 가 만들어집니다. 보고서 깊이를 더 채우려면 `lore review <cat>` 로 2차 패스. → [3-layer 구조](/concepts/three-layers)
 
 ## 카테고리 파일 frontmatter
 
@@ -45,20 +52,15 @@ source_files: 23
 
 ## 본문 규칙
 
-`# H1` 한 번 → `## H2` 여러 번. **H2 단위로 RAG 인덱싱**되므로 H2 제목은 검색 키워드에 걸릴 만한 말로.
-
-```mdx
-# 📘 시그널
-
-## 1. 시그널의 종류
-
-구독자에게 노출되는 4가지 종류 …
-
-## 2. 발행 파이프라인
-
-DetectionWorker → SignalEvent → …
-```
+`# H1` 한 번 → `## H2` 여러 번. **H2 단위로 RAG 인덱싱**되므로 H2 제목은 검색 키워드에 걸릴 만한 말로. `synthesize` 가 만드는 L2 보고서는 `§0 📊 한눈에 보기` 메트릭 카드 + `## 1` ~ `## 9` 의 9섹션 골격을 따릅니다 → [CLI: synthesize](/cli/synthesize).
 
 ## 멱등성
 
-같은 git HEAD 에서 두 번 `lore sync` 해도 결과가 동일합니다. 의미 있는 코드 변경 없이 sync 만 반복해도 git diff 가 0 입니다.
+같은 git HEAD 에서 두 번 `lore sync` 해도 결과가 동일합니다. 의미 있는 코드 변경 없이 sync 만 반복해도 `.lore/draft/` 의 git diff 가 0 입니다.
+
+## 다음 단계
+
+```bash
+lore synthesize          # .lore/draft → .lore/flows (사람용 9섹션 보고서)
+lore review auth         # 보고서 깊이 보강 (코드 발췌 / WHY 사유 / forensics)
+```
