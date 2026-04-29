@@ -114,14 +114,53 @@ export async function loadConfig(cwd: string): Promise<{
 }
 
 /**
- * Validate a domain token (`token` or `token/subtoken`)
- * against the configured domain map.
+ * Parse a `@Domain` token into `{ head, sub }` with whitespace trimmed and
+ * any trailing parenthesized hint stripped.
+ *
+ * Examples:
+ *   `"auth"`                                    → `{ head: "auth", sub: undefined }`
+ *   `"auth / profile"`                          → `{ head: "auth", sub: "profile" }`
+ *   `"인증 / 프로필 메뉴 (Client Component)"`   → `{ head: "인증", sub: "프로필 메뉴" }`
+ *
+ * The trailing-parens convention treats `(Client Component)`, `(Client)`,
+ * `(Server)` etc. as a *category hint* attached to the symbol, not part of
+ * the domain itself.
+ */
+export function parseDomainToken(token: string): { head: string; sub: string | undefined } {
+  const stripped = token.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  const [headRaw, subRaw] = stripped.split('/', 2);
+  return {
+    head: (headRaw ?? '').trim(),
+    sub: subRaw === undefined ? undefined : subRaw.trim() || undefined,
+  };
+}
+
+/**
+ * Resolve a domain head (English slug *or* Korean label) to its config key.
+ * Returns the slug, or `undefined` if no match.
+ */
+export function resolveDomainSlug(
+  head: string,
+  domains: LoreConfig['domains'],
+): string | undefined {
+  if (!head) return undefined;
+  if (domains[head]) return head;
+  for (const [slug, entry] of Object.entries(domains)) {
+    if (entry.label === head) return slug;
+  }
+  return undefined;
+}
+
+/**
+ * Validate a domain token (`token` or `token/subtoken`) against the configured
+ * domain map. Accepts both English slugs and Korean labels for `head`, allows
+ * whitespace around `/`, and strips a trailing `(hint)` suffix.
  */
 export function isDomainKnown(token: string, domains: LoreConfig['domains']): boolean {
-  const [head, sub] = token.split('/', 2);
+  const { head, sub } = parseDomainToken(token);
   if (!head) return false;
-  const entry = domains[head];
-  if (!entry) return false;
+  const slug = resolveDomainSlug(head, domains);
+  if (!slug) return false;
   if (!sub) return true;
-  return entry.subdomains?.includes(sub) ?? false;
+  return domains[slug]?.subdomains?.includes(sub) ?? false;
 }
