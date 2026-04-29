@@ -79,6 +79,20 @@ describe('isDomainKnown', () => {
     expect(isDomainKnown('billing', domains)).toBe(false);
     expect(isDomainKnown('알수없음/x', domains)).toBe(false);
   });
+
+  it('empty subdomains list = head-only namespace (sub validation OFF)', () => {
+    const open: LoreConfig['domains'] = {
+      auth: { label: '인증', subdomains: [] },
+      free: { label: '자유', subdomains: [] },
+    };
+    // sub 가 무엇이든 통과 (head 만 검증)
+    expect(isDomainKnown('auth/profile', open)).toBe(true);
+    expect(isDomainKnown('auth/임의의 한국어 라벨', open)).toBe(true);
+    expect(isDomainKnown('인증 / 프로필 메뉴 (Client Component)', open)).toBe(true);
+    expect(isDomainKnown('자유/anything goes', open)).toBe(true);
+    // head 가 unknown 이면 여전히 false
+    expect(isDomainKnown('unknown/x', open)).toBe(false);
+  });
 });
 
 describe('groupByCategory with domains', () => {
