@@ -1,6 +1,6 @@
 {
   "name": "@lore-ai-automation/parser",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Tree-sitter wrappers for Lore AI: substantive-file detection for Python and TypeScript.",
   "license": "MIT",
   "author": "Terracelab <oss@terracelab.co.kr>",
