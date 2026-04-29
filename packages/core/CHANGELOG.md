@@ -1,5 +1,27 @@
 # @lore-ai-automation/core
 
+## 0.6.3
+
+### Patch Changes
+
+- [#27](https://github.com/terracelab/lore-ai/pull/27) [`1e2b1a4`](https://github.com/terracelab/lore-ai/commit/1e2b1a41fbb9d2bab58e2455606fb3095fc4784c) Thanks [@kyong-dev](https://github.com/kyong-dev)! - `@Domain` 토큰의 한국어 라벨 지원.
+
+  `@Domain: 인증 / 프로필 메뉴 (Client Component)` 같이 **한국어 라벨 + `/` 주변 공백 + 끝의 카테고리 힌트 괄호** 가 포함된 토큰이 전부 `unknown-domain` 으로 떨어지던 문제 해결. 본 프로젝트의 `domains:` 를 영어 key + 한국어 label 로 유지하면서 코드에서 한국어로 적은 토큰도 정상 매칭됩니다.
+
+  ## 신규 export (`@lore-ai-automation/core`)
+  - `parseDomainToken(token)` — `head` / `sub` 추출 + `/` 주변 trim + 끝 `(...)` 힌트 제거
+  - `resolveDomainSlug(head, domains)` — 영어 key 매칭 실패 시 `domain.label` 로 fallback
+
+  ## 시그니처 변경
+  - `groupByCategory(annotations, domains?)` — domain config 를 받으면 한국어 라벨 토큰을 영어 slug 버킷으로 자동 정규화 (legacy 호출도 호환).
+
+  ## 적용 범위
+  - `lore check` — `unknown-domain` 오탐 제거
+  - `lore sync` — 한국어 토큰도 올바른 카테고리 draft 로 분류
+  - `lore synthesize` / `lore review` — 카테고리 인자(`auth`)로 한국어 토큰 가진 심볼들도 한꺼번에 묶임
+
+  예전엔 코드에 `@Domain: auth/profile` 만 써야 했는데, 이제 `@Domain: 인증 / 프로필 메뉴 (Client Component)` 도 똑같이 동작.
+
 ## 0.6.2
 
 ### Patch Changes
