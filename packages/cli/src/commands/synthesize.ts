@@ -143,7 +143,7 @@ export async function synthesizeCommand(
   const cacheDir = resolve(cwd, config.flows.cacheDir);
 
   const all = await gatherAllAnnotations(cwd, config.projects);
-  const grouped = groupByCategory(all);
+  const grouped = groupByCategory(all, config.domains);
 
   if (category) {
     if (!config.domains[category]) {

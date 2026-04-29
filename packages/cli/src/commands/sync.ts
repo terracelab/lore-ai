@@ -110,7 +110,7 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
     await mkdir(flowsDir, { recursive: true });
   }
 
-  const groups = groupByCategory(allAnnotations);
+  const groups = groupByCategory(allAnnotations, config.domains);
   const indexEntries: Array<{ slug: string; icon: string; title: string }> = [];
 
   for (const [slug, anns] of groups) {
