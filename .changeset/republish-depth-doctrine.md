@@ -12,6 +12,8 @@ Republish depth doctrine + `lore review` (0.6.0 → 0.6.1).
 - `core` — `buildReviewPrompt` / `ReviewInput` export, `L2_DOCTRINE` 의 D1–D6 깊이 규칙, 강화된 `renderIndex`
 - `lore-ai` — `lore review <category>` CLI 명령
 
+추가로 **frontmatter 자동 보강** 수정: `synthesize` 가 기존 flow 파일의 frontmatter 를 LLM 으로 넘기기 전에 누락된 `summary` / `tags` / `last_reviewed` 를 L1 metadata + 오늘 날짜로 자동 채워줍니다. 4-필드 frontmatter (`slug` · `title` · `icon` · `order`) 만 있던 파일도 다음 `synthesize` 한 번이면 자동으로 7-필드로 업그레이드됩니다 — LLM 의 "기존 frontmatter 그대로 보존" 규칙과 "7개 필드 모두 포함" 규칙이 충돌해서 4-필드만 출력되던 버그 수정.
+
 추가로 docs 사이트 갱신:
 
 - 신규 `cli/review.mdx` (9개 검사 항목 C1–C9, 두 출력 모드, 권장 워크플로)
