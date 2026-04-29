@@ -162,5 +162,10 @@ export function isDomainKnown(token: string, domains: LoreConfig['domains']): bo
   const slug = resolveDomainSlug(head, domains);
   if (!slug) return false;
   if (!sub) return true;
-  return domains[slug]?.subdomains?.includes(sub) ?? false;
+  const allowed = domains[slug]?.subdomains;
+  // 빈 subdomains = sub 검증 OFF (head-only namespace).
+  // 도메인 등록은 config 에 두되, 컴포넌트/훅 라벨(자유 한국어 phrase) 은
+  // 코드에 두기 위한 정책. 비어 있지 않으면 기존대로 strict.
+  if (!allowed || allowed.length === 0) return true;
+  return allowed.includes(sub);
 }
