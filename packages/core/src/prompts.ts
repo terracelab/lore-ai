@@ -2,6 +2,46 @@ import type { Annotation } from './types.js';
 import type { LoreConfig } from './config.js';
 import { renderL3 } from './markdown.js';
 
+function todayISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * If the existing flow body has a frontmatter block with only the minimal
+ * 4 fields (slug/title/icon/order), pre-inject the missing report-grade
+ * fields (summary/tags/last_reviewed) using L1 metadata + today. This
+ * removes ambiguity from the LLM's "preserve existing frontmatter verbatim"
+ * rule — the LLM now sees a complete frontmatter and preserves it as-is,
+ * which means the file gets upgraded automatically on the next synthesize.
+ */
+function augmentFrontmatter(
+  body: string | undefined,
+  expected: { summary: string; tags: string[]; last_reviewed: string },
+): string | undefined {
+  if (!body) return undefined;
+  const fmRegex = /^---\n([\s\S]*?)\n---\n?/;
+  const match = body.match(fmRegex);
+  if (!match) return body; // no frontmatter — let the LLM create one fresh
+  const fmContent = match[1] ?? '';
+  const existingKeys = new Set(
+    fmContent
+      .split('\n')
+      .map((line) => line.split(':')[0]?.trim())
+      .filter((k): k is string => Boolean(k)),
+  );
+  const additions: string[] = [];
+  if (!existingKeys.has('summary')) additions.push(`summary: ${expected.summary}`);
+  if (!existingKeys.has('tags') && expected.tags.length > 0) {
+    additions.push(`tags: [${expected.tags.join(', ')}]`);
+  }
+  if (!existingKeys.has('last_reviewed')) {
+    additions.push(`last_reviewed: ${expected.last_reviewed}`);
+  }
+  if (additions.length === 0) return body;
+  const newFm = `${fmContent}\n${additions.join('\n')}`;
+  return body.replace(fmRegex, `---\n${newFm}\n---\n`);
+}
+
 export interface SynthesizeInput {
   category: string;
   annotations: Annotation[];
@@ -278,7 +318,7 @@ L3 facts 의 \`**Connection**\` 블록 (소스 어노테이션의 \`@Connection\
 # 출력 규약
 
 - \`\`\` 펜스로 문서 전체를 감싸지 않는다.
-- **YAML frontmatter 는 무조건 포함** (필수). 기존 파일 상단에 \`---\` 으로 시작하는 frontmatter 블록이 있으면 **그대로 보존** 하고 닫는 \`---\` 아래 본문만 새로 작성한다. frontmatter 가 없거나 신규 파일이면 다음 필드를 직접 작성: \`slug\` (카테고리 키) · \`title\` (한국어 라벨) · \`icon\` (이모지) · \`order\` · \`summary\` (한 줄) · \`tags\` (subdomains) · \`last_reviewed\` (오늘 날짜 YYYY-MM-DD). **frontmatter 가 빠진 출력은 잘못된 결과물.**
+- **YAML frontmatter 는 7개 필드 모두 포함 (필수)**: \`slug\` · \`title\` · \`icon\` · \`order\` · \`summary\` · \`tags\` · \`last_reviewed\`. 기존 파일에 frontmatter 가 있으면 **그대로 보존** (Existing body 의 frontmatter 는 빌더가 누락 필드를 \`# 1. Category metadata\` 기준으로 이미 7개로 보강해둔 상태 — 추가 가공 금지). frontmatter 자체가 없거나 신규 파일이면 7개 필드를 직접 작성: \`summary\` 는 L1 label + L3 통계로 한 줄, \`tags\` 는 subdomains, \`last_reviewed\` 는 \`# 1. Category metadata\` 의 \`today\` 값. **4개 필드만 있는 출력 / frontmatter 가 빠진 출력은 잘못된 결과물.**
 - Korean voice, 사실 우선, 두루뭉실 회피.`;
 
 /**
@@ -292,8 +332,15 @@ export function buildSynthesizePrompt(input: SynthesizeInput): string {
   const cat = config.domains[category];
   const label = cat?.label ?? category;
   const subdomains = cat?.subdomains ?? [];
+  const today = todayISO();
 
   const l3 = annotations.map(renderL3).join('\n\n');
+
+  const augmentedBody = augmentFrontmatter(existingBody, {
+    summary: `${label} 카테고리 (${annotations.length}개 심볼)`,
+    tags: subdomains,
+    last_reviewed: today,
+  });
 
   return [
     `You are the technical writer for the "${label}" (${category}) flow in the Lore AI documentation system.`,
@@ -303,6 +350,7 @@ export function buildSynthesizePrompt(input: SynthesizeInput): string {
     `# 1. Category metadata`,
     `- slug: ${category}`,
     `- label: ${label}`,
+    `- today: ${today}   ← use this for \`last_reviewed\` if missing/stale`,
     subdomains.length ? `- subdomains: ${subdomains.join(', ')}` : '',
     '',
     `# 2. L1 — Domain map (excerpt)`,
@@ -310,8 +358,8 @@ export function buildSynthesizePrompt(input: SynthesizeInput): string {
       .map(([k, v]) => `- \`${k}\` — ${v.label}`)
       .join('\n'),
     '',
-    existingBody
-      ? `# 3. Existing L2 body (사실 보존 + 변경된 부분만 부분 갱신 — 옛 평면 구조면 보고서 포맷으로 재배치)\n\n${existingBody}`
+    augmentedBody
+      ? `# 3. Existing L2 body (frontmatter 는 이미 7-필드로 보강됨 — 그대로 보존하고 본문만 변경된 부분 갱신)\n\n${augmentedBody}`
       : `# 3. Existing L2 body\n\n_(none — first-time synthesis)_`,
     '',
     `# 4. L3 — symbols & business logic facts`,
@@ -335,6 +383,7 @@ export function buildSynthesizePrompt(input: SynthesizeInput): string {
  */
 export function buildSynthesizeAllPrompt(input: SynthesizeAllInput): string {
   const { categories, config, flowsDir, recentDiff } = input;
+  const today = todayISO();
 
   const l1 = Object.entries(config.domains)
     .map(([k, v]) => {
@@ -347,12 +396,16 @@ export function buildSynthesizeAllPrompt(input: SynthesizeAllInput): string {
     .map((c) => {
       const meta = config.domains[c.category];
       const label = meta?.label ?? c.category;
-      const subs = meta?.subdomains?.length
-        ? `\n  - subdomains: ${meta.subdomains.join(', ')}`
-        : '';
+      const subdomains = meta?.subdomains ?? [];
+      const subs = subdomains.length ? `\n  - subdomains: ${subdomains.join(', ')}` : '';
       const l3 = c.annotations.map(renderL3).join('\n\n');
-      const existing = c.existingBody
-        ? `\n\n### Existing body (사실 보존 + 변경된 부분만 부분 갱신 — 옛 평면 구조면 보고서 포맷으로 재배치)\n\n${c.existingBody}`
+      const augmented = augmentFrontmatter(c.existingBody, {
+        summary: `${label} 카테고리 (${c.annotations.length}개 심볼)`,
+        tags: subdomains,
+        last_reviewed: today,
+      });
+      const existing = augmented
+        ? `\n\n### Existing body (frontmatter 는 7-필드로 보강됨 — 그대로 보존, 본문만 변경된 부분 갱신)\n\n${augmented}`
         : `\n\n### Existing body\n\n_(none — first-time synthesis)_`;
       return [
         `## Category: \`${c.category}\` — ${label}${subs}`,
