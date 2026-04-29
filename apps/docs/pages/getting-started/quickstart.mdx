@@ -118,7 +118,16 @@ lore check                           # 전체 스캔 (모든 configured projects
 lore sync
 ```
 
-`.lore/flows/auth.md`, `subscription.md`, `INDEX.md` 가 생성됩니다.
+`.lore/draft/auth.md`, `subscription.md` (raw L3 사실) + `.lore/flows/INDEX.md` (카테고리 진입점) 이 생성됩니다.
+
+### Synthesize → Review
+
+```bash
+lore synthesize             # L3 → L2 보고서 (.lore/flows/<cat>.md)
+lore review auth            # 보고서 깊이 보강 (선택)
+```
+
+`synthesize` 는 9섹션 보고서를 만들고, `review` 는 코드 발췌·WHY 사유·forensics 를 보강합니다 → [3-layer 구조](/concepts/three-layers).
 
 </Steps>
 

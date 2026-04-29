@@ -29,4 +29,15 @@ source_files: 23
 
 ## INDEX.md
 
-자동 생성. `slug: index` 로 마킹되어 Lore Board 의 `getAllFlows()` 가 사이드바에 노출하지 않습니다.
+`lore sync` 가 `.lore/flows/INDEX.md` 로 자동 생성합니다. `slug: index` 로 마킹되어 Lore Board 의 `getAllFlows()` 가 사이드바에 노출하지 않습니다. 본문에는 다음이 포함됩니다:
+
+- 카테고리 표 (#, slug, 아이콘, 이름, 문서 링크)
+- frontmatter 스펙 (대시보드 파서용)
+- L1 / L2 / L3 레이어 개념
+- `lore sync` → `lore synthesize` → `lore review` 갱신 흐름
+
+## 어디서 만들어지나
+
+- L3 raw facts 는 [`lore sync`](/cli/sync) 가 `.lore/draft/<slug>.md` 에 적고 `last_reviewed` / `source_files` 를 자동 주입합니다.
+- L2 보고서는 [`lore synthesize`](/cli/synthesize) 가 `.lore/flows/<slug>.md` 에 적습니다 (frontmatter 는 보존, 본문만 9섹션 골격으로 재작성).
+- [`lore review`](/cli/review) 는 frontmatter 를 절대 건드리지 않고 본문만 부분 보강합니다.
